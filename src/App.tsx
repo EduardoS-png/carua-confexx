@@ -5,6 +5,14 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
+import DashboardLayout from "./pages/dashboard/DashboardLayout.tsx";
+import DashboardHome from "./pages/dashboard/DashboardHome.tsx";
+import Pedidos from "./pages/dashboard/Pedidos.tsx";
+import Materiais from "./pages/dashboard/Materiais.tsx";
+import Profissionais from "./pages/dashboard/Profissionais.tsx";
+import Financeiro from "./pages/dashboard/Financeiro.tsx";
+import Marketplace from "./pages/Marketplace.tsx";
+import ProfissionalDetalhe from "./pages/ProfissionalDetalhe.tsx";
 
 const queryClient = new QueryClient();
 
@@ -16,7 +24,15 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/marketplace/:id" element={<ProfissionalDetalhe />} />
+          <Route path="/app" element={<DashboardLayout />}>
+            <Route index element={<DashboardHome />} />
+            <Route path="pedidos" element={<Pedidos />} />
+            <Route path="materiais" element={<Materiais />} />
+            <Route path="profissionais" element={<Profissionais />} />
+            <Route path="financeiro" element={<Financeiro />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
