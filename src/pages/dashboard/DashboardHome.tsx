@@ -112,7 +112,7 @@ const DashboardHome = () => {
       <div className="grid gap-4 sm:grid-cols-3">
         <QuickAction to="/app/pedidos" icon={ClipboardList} label="Novo pedido" />
         <QuickAction to="/app/materiais" icon={Boxes} label="Registrar material" />
-        <QuickAction to="/app/profissionais" icon={Users} label="Cadastrar profissional" />
+        <QuickAction to="/app/equipe" icon={Users} label="Cadastrar membro" />
       </div>
     </div>
   );
