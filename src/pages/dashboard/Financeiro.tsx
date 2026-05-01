@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { TrendingUp, Wallet, Receipt } from "lucide-react";
-import { pedidos } from "@/data/mock";
+import { pedidos, equipe } from "@/data/mock";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 
 const Financeiro = () => {
@@ -10,11 +10,13 @@ const Financeiro = () => {
   const recebido = concluidos.reduce((s, p) => s + p.quantidade * p.valorPeca, 0);
   const pendente = total - recebido;
 
-  // Pagamentos por profissional (simulado: 60% do valor por peça vai para responsável)
+  // Pagamentos por membro da equipe (valor por peça definido no cadastro)
   const porProfissional: Record<string, number> = {};
   pedidos.forEach((p) => {
     if (!p.responsavel) return;
-    porProfissional[p.responsavel] = (porProfissional[p.responsavel] ?? 0) + p.quantidade * p.valorPeca * 0.6;
+    const membro = equipe.find((m) => m.nome === p.responsavel);
+    if (!membro) return;
+    porProfissional[p.responsavel] = (porProfissional[p.responsavel] ?? 0) + p.quantidade * membro.pagamentoPorPeca;
   });
 
   const cards = [
@@ -82,7 +84,7 @@ const Financeiro = () => {
                 </span>
               </div>
             ))}
-            <p className="pt-2 text-xs text-muted-foreground">* Cálculo: 60% do valor por peça destinado ao responsável da etapa.</p>
+            <p className="pt-2 text-xs text-muted-foreground">* Cálculo: valor por peça definido no cadastro de cada membro da equipe × quantidade do pedido.</p>
           </CardContent>
         </Card>
       </div>

@@ -9,8 +9,9 @@ import DashboardLayout from "./pages/dashboard/DashboardLayout.tsx";
 import DashboardHome from "./pages/dashboard/DashboardHome.tsx";
 import Pedidos from "./pages/dashboard/Pedidos.tsx";
 import Materiais from "./pages/dashboard/Materiais.tsx";
-import Profissionais from "./pages/dashboard/Profissionais.tsx";
+import Equipe from "./pages/dashboard/Equipe.tsx";
 import Financeiro from "./pages/dashboard/Financeiro.tsx";
+import Relatorios from "./pages/dashboard/Relatorios.tsx";
 import Marketplace from "./pages/Marketplace.tsx";
 import ProfissionalDetalhe from "./pages/ProfissionalDetalhe.tsx";
 
@@ -30,8 +31,9 @@ const App = () => (
             <Route index element={<DashboardHome />} />
             <Route path="pedidos" element={<Pedidos />} />
             <Route path="materiais" element={<Materiais />} />
-            <Route path="profissionais" element={<Profissionais />} />
+            <Route path="equipe" element={<Equipe />} />
             <Route path="financeiro" element={<Financeiro />} />
+            <Route path="relatorios" element={<Relatorios />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -14,7 +14,7 @@ export interface Pedido {
   quantidade: number;
   prazo: string;
   valorPeca: number;
-  responsavel?: string;
+  responsavel?: string; // nome de um membro da equipe interna
   etapaAtual: EtapaProducao;
   etapas: Record<EtapaProducao, StatusEtapa>;
   criadoEm: string;
@@ -30,6 +30,31 @@ export interface Material {
   vinculadoA?: string; // pedido id
 }
 
+export type TipoMovimento = "entrada" | "saida";
+
+export interface MovimentoMaterial {
+  id: string;
+  materialId: string;
+  tipo: TipoMovimento;
+  quantidade: number;
+  observacao?: string;
+  pedidoId?: string;
+  data: string;
+}
+
+// Equipe interna da facção (não aparece no marketplace público)
+export interface MembroEquipe {
+  id: string;
+  nome: string;
+  funcao: string; // costureira, cortador, acabamento...
+  etapas: EtapaProducao[]; // em quais etapas atua
+  telefone?: string;
+  pagamentoPorPeca: number; // valor que recebe por peça
+  ativo: boolean;
+  desde: string;
+}
+
+// Profissionais do marketplace público (autônomos, fora da facção)
 export interface Profissional {
   id: string;
   nome: string;
@@ -44,6 +69,48 @@ export interface Profissional {
   pedidosConcluidos: number;
   avaliacao: number;
 }
+
+export const equipe: MembroEquipe[] = [
+  {
+    id: "eq1",
+    nome: "Dona Maria",
+    funcao: "Costureira",
+    etapas: ["costura"],
+    telefone: "(81) 99999-1111",
+    pagamentoPorPeca: 5,
+    ativo: true,
+    desde: "2024-03-10",
+  },
+  {
+    id: "eq2",
+    nome: "Joana",
+    funcao: "Costureira e acabamento",
+    etapas: ["costura", "acabamento"],
+    telefone: "(81) 99999-2222",
+    pagamentoPorPeca: 6,
+    ativo: true,
+    desde: "2024-08-22",
+  },
+  {
+    id: "eq3",
+    nome: "Carlos",
+    funcao: "Cortador",
+    etapas: ["corte"],
+    telefone: "(81) 99999-3333",
+    pagamentoPorPeca: 3,
+    ativo: true,
+    desde: "2025-01-15",
+  },
+  {
+    id: "eq4",
+    nome: "Lúcia",
+    funcao: "Acabamento",
+    etapas: ["acabamento", "entrega"],
+    pagamentoPorPeca: 2.5,
+    ativo: true,
+    desde: "2025-06-02",
+  },
+];
 
 export const pedidos: Pedido[] = [
   {
@@ -89,8 +156,9 @@ export const pedidos: Pedido[] = [
     quantidade: 60,
     prazo: "2026-05-04",
     valorPeca: 14,
+    responsavel: "Lúcia",
     etapaAtual: "entrega",
-    etapas: { corte: "concluido", costura: "concluido", acabamento: "concluido", entrega: "em_andamento" },
+    etapas: { corte: "concluido", costura: "concluido", acabamento: "concluido", entrega: "concluido" },
     criadoEm: "2026-04-10",
   },
   {
@@ -113,6 +181,12 @@ export const materiais: Material[] = [
   { id: "M4", nome: "Botão madrepérola", unidade: "un", estoque: 1200, minimo: 200, ultimaEntrada: "2026-04-22" },
   { id: "M5", nome: "Zíper 20cm", unidade: "un", estoque: 35, minimo: 50, ultimaEntrada: "2026-04-12" },
   { id: "M6", nome: "Renda guipir", unidade: "m", estoque: 18, minimo: 10, ultimaEntrada: "2026-04-25" },
+];
+
+export const movimentosIniciais: MovimentoMaterial[] = [
+  { id: "mv1", materialId: "M1", tipo: "entrada", quantidade: 300, observacao: "Compra fornecedor SP", data: "2026-04-20" },
+  { id: "mv2", materialId: "M1", tipo: "saida", quantidade: 60, observacao: "Lote inicial corte", pedidoId: "LT-2401", data: "2026-04-22" },
+  { id: "mv3", materialId: "M3", tipo: "saida", quantidade: 18, pedidoId: "LT-2402", data: "2026-04-23" },
 ];
 
 export const profissionais: Profissional[] = [

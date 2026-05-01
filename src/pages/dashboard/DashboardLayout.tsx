@@ -13,15 +13,16 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, ClipboardList, Boxes, Users, Wallet, ArrowLeft, Store } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Boxes, Users, Wallet, ArrowLeft, Store, BarChart3 } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 
 const items = [
   { to: "/app", label: "Visão geral", icon: LayoutDashboard, end: true },
   { to: "/app/pedidos", label: "Pedidos", icon: ClipboardList },
   { to: "/app/materiais", label: "Materiais", icon: Boxes },
-  { to: "/app/profissionais", label: "Profissionais", icon: Users },
+  { to: "/app/equipe", label: "Equipe", icon: Users },
   { to: "/app/financeiro", label: "Financeiro", icon: Wallet },
+  { to: "/app/relatorios", label: "Relatórios", icon: BarChart3 },
 ];
 
 const AppSidebar = () => {

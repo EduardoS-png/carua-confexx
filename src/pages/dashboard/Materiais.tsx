@@ -1,23 +1,65 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, ArrowDown, ArrowUp, Link2 } from "lucide-react";
-import { materiais as initialMateriais, pedidos, type Material } from "@/data/mock";
+import { Plus, ArrowDown, ArrowUp, Link2, History } from "lucide-react";
+import {
+  materiais as initialMateriais,
+  movimentosIniciais,
+  pedidos,
+  type Material,
+  type MovimentoMaterial,
+  type TipoMovimento,
+} from "@/data/mock";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { toast } from "sonner";
 
 const Materiais = () => {
   const [lista, setLista] = useState<Material[]>(initialMateriais);
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ nome: "", unidade: "un", estoque: "", minimo: "" });
+  const [movs, setMovs] = useState<MovimentoMaterial[]>(movimentosIniciais);
+  const [openNovo, setOpenNovo] = useState(false);
+  const [openHist, setOpenHist] = useState<string | null>(null);
+  const [openMov, setOpenMov] = useState<{ material: Material; tipo: TipoMovimento } | null>(null);
 
-  const movimentar = (id: string, delta: number) => {
-    setLista((prev) => prev.map((m) => m.id === id ? { ...m, estoque: Math.max(0, m.estoque + delta), ultimaEntrada: new Date().toISOString().slice(0, 10) } : m));
-    toast.success(delta > 0 ? "Entrada registrada" : "Saída registrada");
+  const [form, setForm] = useState({ nome: "", unidade: "un", estoque: "", minimo: "" });
+  const [movForm, setMovForm] = useState({ quantidade: "", observacao: "", pedidoId: "" });
+
+  const movsDe = (id: string) => movs.filter((m) => m.materialId === id).sort((a, b) => b.data.localeCompare(a.data));
+
+  const aplicarMovimento = () => {
+    if (!openMov) return;
+    const qtd = Number(movForm.quantidade);
+    if (!qtd || qtd <= 0) return toast.error("Informe uma quantidade válida");
+    const { material, tipo } = openMov;
+    const delta = tipo === "entrada" ? qtd : -qtd;
+    if (tipo === "saida" && material.estoque < qtd) return toast.error("Estoque insuficiente");
+
+    setLista((prev) =>
+      prev.map((m) =>
+        m.id === material.id
+          ? { ...m, estoque: m.estoque + delta, ultimaEntrada: new Date().toISOString().slice(0, 10) }
+          : m,
+      ),
+    );
+    setMovs((prev) => [
+      {
+        id: `mv${prev.length + 1}-${Date.now()}`,
+        materialId: material.id,
+        tipo,
+        quantidade: qtd,
+        observacao: movForm.observacao || undefined,
+        pedidoId: movForm.pedidoId || undefined,
+        data: new Date().toISOString().slice(0, 10),
+      },
+      ...prev,
+    ]);
+    toast.success(`${tipo === "entrada" ? "Entrada" : "Saída"} de ${qtd} ${material.unidade} registrada`);
+    setMovForm({ quantidade: "", observacao: "", pedidoId: "" });
+    setOpenMov(null);
   };
 
   const criar = () => {
@@ -32,9 +74,11 @@ const Materiais = () => {
     };
     setLista([novo, ...lista]);
     setForm({ nome: "", unidade: "un", estoque: "", minimo: "" });
-    setOpen(false);
+    setOpenNovo(false);
     toast.success("Material cadastrado");
   };
+
+  const histMaterial = useMemo(() => (openHist ? lista.find((m) => m.id === openHist) : null), [openHist, lista]);
 
   return (
     <div className="space-y-8">
@@ -42,7 +86,7 @@ const Materiais = () => {
         title="Materiais"
         description="Controle entradas, saídas e vincule insumos a pedidos."
         action={
-          <Dialog open={open} onOpenChange={setOpen}>
+          <Dialog open={openNovo} onOpenChange={setOpenNovo}>
             <DialogTrigger asChild><Button variant="hero" size="lg"><Plus /> Novo material</Button></DialogTrigger>
             <DialogContent className="sm:max-w-md">
               <DialogHeader><DialogTitle className="font-display">Cadastrar material</DialogTitle></DialogHeader>
@@ -55,7 +99,7 @@ const Materiais = () => {
                 </div>
               </div>
               <DialogFooter>
-                <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
+                <Button variant="ghost" onClick={() => setOpenNovo(false)}>Cancelar</Button>
                 <Button variant="hero" onClick={criar}>Salvar</Button>
               </DialogFooter>
             </DialogContent>
@@ -90,12 +134,15 @@ const Materiais = () => {
                   </div>
                 )}
 
-                <div className="flex gap-2">
-                  <Button size="sm" variant="soft" className="flex-1" onClick={() => movimentar(m.id, 10)}>
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="soft" className="flex-1" onClick={() => setOpenMov({ material: m, tipo: "entrada" })}>
                     <ArrowDown className="text-success" /> Entrada
                   </Button>
-                  <Button size="sm" variant="soft" className="flex-1" onClick={() => movimentar(m.id, -1)}>
+                  <Button size="sm" variant="soft" className="flex-1" onClick={() => setOpenMov({ material: m, tipo: "saida" })}>
                     <ArrowUp className="text-destructive" /> Saída
+                  </Button>
+                  <Button size="sm" variant="ghost" onClick={() => setOpenHist(m.id)}>
+                    <History className="h-4 w-4" />
                   </Button>
                 </div>
               </CardContent>
@@ -103,6 +150,90 @@ const Materiais = () => {
           );
         })}
       </div>
+
+      {/* Diálogo de movimentação flexível */}
+      <Dialog open={!!openMov} onOpenChange={(v) => !v && setOpenMov(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="font-display">
+              {openMov?.tipo === "entrada" ? "Registrar entrada" : "Registrar saída"} — {openMov?.material.nome}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-3 py-2">
+            <div>
+              <Label>Quantidade ({openMov?.material.unidade})</Label>
+              <Input
+                className="mt-1.5"
+                type="number"
+                step="0.01"
+                autoFocus
+                value={movForm.quantidade}
+                onChange={(e) => setMovForm({ ...movForm, quantidade: e.target.value })}
+                placeholder="Ex: 12,5"
+              />
+              <p className="mt-1 text-xs text-muted-foreground">Estoque atual: {openMov?.material.estoque} {openMov?.material.unidade}</p>
+            </div>
+            {openMov?.tipo === "saida" && (
+              <div>
+                <Label>Vincular a pedido (opcional)</Label>
+                <select
+                  value={movForm.pedidoId}
+                  onChange={(e) => setMovForm({ ...movForm, pedidoId: e.target.value })}
+                  className="mt-1.5 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                >
+                  <option value="">Nenhum</option>
+                  {pedidos.map((p) => <option key={p.id} value={p.id}>{p.id} · {p.produto}</option>)}
+                </select>
+              </div>
+            )}
+            <div>
+              <Label>Observação (opcional)</Label>
+              <Textarea
+                className="mt-1.5"
+                rows={2}
+                value={movForm.observacao}
+                onChange={(e) => setMovForm({ ...movForm, observacao: e.target.value })}
+                placeholder={openMov?.tipo === "entrada" ? "Ex: compra do fornecedor X" : "Ex: refugo de corte / amostra"}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setOpenMov(null)}>Cancelar</Button>
+            <Button variant="hero" onClick={aplicarMovimento}>Confirmar</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Histórico */}
+      <Dialog open={!!openHist} onOpenChange={(v) => !v && setOpenHist(null)}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="font-display">Histórico — {histMaterial?.nome}</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[60vh] space-y-2 overflow-y-auto">
+            {histMaterial && movsDe(histMaterial.id).length === 0 && (
+              <p className="py-6 text-center text-sm text-muted-foreground">Sem movimentações ainda.</p>
+            )}
+            {histMaterial && movsDe(histMaterial.id).map((mv) => (
+              <div key={mv.id} className="flex items-start justify-between gap-3 rounded-lg border border-border p-3">
+                <div className="flex items-start gap-3">
+                  {mv.tipo === "entrada"
+                    ? <ArrowDown className="mt-0.5 h-4 w-4 text-success" />
+                    : <ArrowUp className="mt-0.5 h-4 w-4 text-destructive" />}
+                  <div>
+                    <p className="text-sm font-semibold">
+                      {mv.tipo === "entrada" ? "Entrada" : "Saída"} de {mv.quantidade} {histMaterial.unidade}
+                    </p>
+                    {mv.observacao && <p className="text-xs text-muted-foreground">{mv.observacao}</p>}
+                    {mv.pedidoId && <p className="mt-0.5 font-mono text-xs text-primary">{mv.pedidoId}</p>}
+                  </div>
+                </div>
+                <span className="text-xs text-muted-foreground">{new Date(mv.data).toLocaleDateString("pt-BR")}</span>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
