@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Plus, Calendar, User, Package, ArrowRight } from "lucide-react";
-import { pedidos as initialPedidos, profissionais, type Pedido, type EtapaProducao, type StatusEtapa } from "@/data/mock";
+import { pedidos as initialPedidos, equipe, type Pedido, type EtapaProducao, type StatusEtapa } from "@/data/mock";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { toast } from "sonner";
 
@@ -103,7 +103,9 @@ const Pedidos = () => {
                     className="mt-1.5 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
                   >
                     <option value="">Definir depois</option>
-                    {profissionais.map((p) => <option key={p.id} value={p.nome}>{p.nome}</option>)}
+                    {equipe.filter((m) => m.ativo).map((m) => (
+                      <option key={m.id} value={m.nome}>{m.nome} — {m.funcao}</option>
+                    ))}
                   </select>
                 </div>
               </div>
