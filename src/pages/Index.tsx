@@ -45,7 +45,7 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild variant="hero" size="xl">
-                <Link to="/app">Começar agora <ArrowRight /></Link>
+                <Link to="/cadastro">Começar agora <ArrowRight /></Link>
               </Button>
               <Button asChild variant="outline" size="xl">
                 <Link to="/marketplace">Ver profissionais</Link>
@@ -131,7 +131,7 @@ const Index = () => {
               ))}
             </ul>
             <Button asChild variant="hero" size="lg" className="mt-8">
-              <Link to="/app">Conhecer o sistema <ArrowRight /></Link>
+              <Link to="/cadastro">Conhecer o sistema <ArrowRight /></Link>
             </Button>
           </div>
 
@@ -262,7 +262,7 @@ const Index = () => {
                 Grátis para começar. Sem complicação. Pronto pro chão da fábrica.
               </p>
               <Button asChild size="xl" variant="secondary" className="mt-8 bg-background text-primary hover:bg-background/90">
-                <Link to="/app">Testar gratuitamente <ArrowRight /></Link>
+                <Link to="/cadastro">Testar gratuitamente <ArrowRight /></Link>
               </Button>
             </div>
           </div>
