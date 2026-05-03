@@ -40,10 +40,10 @@ export const SiteHeader = () => {
 
         <div className="hidden items-center gap-3 md:flex">
           <Button asChild variant="ghost" size="sm">
-            <Link to="/app">Entrar</Link>
+            <Link to="/login">Entrar</Link>
           </Button>
           <Button asChild variant="hero" size="sm">
-            <Link to="/app">Testar grátis</Link>
+            <Link to="/cadastro">Testar grátis</Link>
           </Button>
         </div>
 
@@ -60,8 +60,11 @@ export const SiteHeader = () => {
                 {l.label}
               </a>
             ))}
+            <Button asChild variant="ghost" className="mt-2">
+              <Link to="/login">Entrar</Link>
+            </Button>
             <Button asChild variant="hero" className="mt-2">
-              <Link to="/app">Testar grátis</Link>
+              <Link to="/cadastro">Testar grátis</Link>
             </Button>
           </div>
         </div>
