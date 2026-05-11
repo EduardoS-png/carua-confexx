@@ -14,7 +14,8 @@ export interface Pedido {
   quantidade: number;
   prazo: string;
   valorPeca: number;
-  responsavel?: string; // nome de um membro da equipe interna
+  responsavel?: string; // responsável geral (legado / coordenador)
+  responsaveisPorEtapa: Partial<Record<EtapaProducao, string>>; // quem faz cada etapa
   etapaAtual: EtapaProducao;
   etapas: Record<EtapaProducao, StatusEtapa>;
   criadoEm: string;
@@ -121,6 +122,7 @@ export const pedidos: Pedido[] = [
     prazo: "2026-05-12",
     valorPeca: 8.5,
     responsavel: "Dona Maria",
+    responsaveisPorEtapa: { corte: "Carlos", costura: "Dona Maria", acabamento: "Joana", entrega: "Lúcia" },
     etapaAtual: "costura",
     etapas: { corte: "concluido", costura: "em_andamento", acabamento: "pendente", entrega: "pendente" },
     criadoEm: "2026-04-22",
@@ -133,6 +135,7 @@ export const pedidos: Pedido[] = [
     prazo: "2026-05-08",
     valorPeca: 22,
     responsavel: "Joana",
+    responsaveisPorEtapa: { corte: "Carlos", costura: "Joana", acabamento: "Joana", entrega: "Lúcia" },
     etapaAtual: "acabamento",
     etapas: { corte: "concluido", costura: "concluido", acabamento: "em_andamento", entrega: "pendente" },
     criadoEm: "2026-04-18",
@@ -145,6 +148,7 @@ export const pedidos: Pedido[] = [
     prazo: "2026-05-20",
     valorPeca: 18,
     responsavel: "Carlos",
+    responsaveisPorEtapa: { corte: "Carlos", costura: "Dona Maria", acabamento: "Lúcia" },
     etapaAtual: "corte",
     etapas: { corte: "em_andamento", costura: "pendente", acabamento: "pendente", entrega: "pendente" },
     criadoEm: "2026-04-28",
@@ -157,6 +161,7 @@ export const pedidos: Pedido[] = [
     prazo: "2026-05-04",
     valorPeca: 14,
     responsavel: "Lúcia",
+    responsaveisPorEtapa: { corte: "Carlos", costura: "Joana", acabamento: "Lúcia", entrega: "Lúcia" },
     etapaAtual: "entrega",
     etapas: { corte: "concluido", costura: "concluido", acabamento: "concluido", entrega: "concluido" },
     criadoEm: "2026-04-10",
@@ -168,6 +173,7 @@ export const pedidos: Pedido[] = [
     quantidade: 30,
     prazo: "2026-05-15",
     valorPeca: 16,
+    responsaveisPorEtapa: {},
     etapaAtual: "corte",
     etapas: { corte: "pendente", costura: "pendente", acabamento: "pendente", entrega: "pendente" },
     criadoEm: "2026-04-30",

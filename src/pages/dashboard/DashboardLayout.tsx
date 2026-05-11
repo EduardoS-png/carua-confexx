@@ -13,7 +13,7 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, ClipboardList, Boxes, Users, Wallet, ArrowLeft, Store, BarChart3 } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Boxes, Users, Wallet, ArrowLeft, Store, BarChart3, Bell } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 
 const items = [
@@ -23,6 +23,7 @@ const items = [
   { to: "/app/equipe", label: "Equipe", icon: Users },
   { to: "/app/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/app/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/app/alertas", label: "Alertas e gargalos", icon: Bell },
 ];
 
 const AppSidebar = () => {

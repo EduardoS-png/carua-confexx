@@ -53,62 +53,49 @@ const Cadastro = () => {
     <div className="flex min-h-screen">
       {/* Left — Hero Panel */}
       <div className="relative hidden w-[52%] overflow-hidden lg:block">
-        <img
-          src={heroImg}
-          alt="Produção têxtil"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-br from-[hsl(20,43%,12%)] via-[hsl(17,78%,24%)/0.85] to-[hsl(21,90%,35%)/0.75]" />
+        <img src={heroImg} alt="Produção têxtil" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-[hsl(20,43%,8%)]/85" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[hsl(20,43%,6%)] via-[hsl(20,43%,8%)/0.6] to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-[hsl(17,78%,18%)/0.5]" />
 
         <div className="relative z-10 flex h-full flex-col justify-between p-12">
           <Link to="/" className="flex items-center gap-2.5">
             <Logo className="h-9 w-9" inverted />
-            <span className="font-display text-xl font-bold text-white/95">
-              Caruá Confex
-            </span>
+            <span className="font-display text-xl font-bold text-white">Caruá Confex</span>
           </Link>
 
           <div className="max-w-md space-y-8">
             <div className="space-y-4">
-              <h1 className="font-display text-4xl font-extrabold leading-[1.1] text-white">
-                Organize sua
-                <br />
-                <span className="bg-gradient-to-r from-orange-300 to-amber-200 bg-clip-text text-transparent">
-                  confecção hoje.
-                </span>
+              <h1 className="font-display text-4xl font-extrabold leading-[1.1] text-white drop-shadow-lg">
+                Organize sua<br />
+                <span className="text-orange-300">confecção hoje.</span>
               </h1>
-              <p className="text-base leading-relaxed text-white/70">
+              <p className="text-base leading-relaxed text-white/90 drop-shadow">
                 Cadastro gratuito. Sem cartão de crédito.
                 Comece a controlar sua produção em minutos.
               </p>
             </div>
 
-            {/* Feature cards */}
             <div className="grid grid-cols-1 gap-3">
               {[
                 { icon: Scissors, title: "Gestão de Produção", desc: "Pedidos, etapas e prazos" },
                 { icon: BarChart3, title: "Relatórios e Metas", desc: "Dados para decisões" },
                 { icon: Users, title: "Equipe e Marketplace", desc: "Conecte profissionais" },
               ].map((item) => (
-                <div
-                  key={item.title}
-                  className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-4 backdrop-blur-sm"
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white/10">
+                <div key={item.title} className="flex items-center gap-4 rounded-2xl border border-white/15 bg-black/40 p-4 backdrop-blur-md">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-400/20">
                     <item.icon className="h-5 w-5 text-orange-300" />
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-white">{item.title}</p>
-                    <p className="text-xs text-white/50">{item.desc}</p>
+                    <p className="text-xs text-white/75">{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <p className="text-xs text-white/40">
-            Feito com 🧡 para o polo têxtil do Agreste
-          </p>
+          <p className="text-xs text-white/70">Feito com 🧡 para o polo têxtil do Agreste</p>
         </div>
       </div>
 
