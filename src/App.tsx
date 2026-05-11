@@ -16,6 +16,7 @@ import Financeiro from "./pages/dashboard/Financeiro.tsx";
 import Relatorios from "./pages/dashboard/Relatorios.tsx";
 import Marketplace from "./pages/Marketplace.tsx";
 import ProfissionalDetalhe from "./pages/ProfissionalDetalhe.tsx";
+import Alertas from "./pages/dashboard/Alertas.tsx";
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="equipe" element={<Equipe />} />
             <Route path="financeiro" element={<Financeiro />} />
             <Route path="relatorios" element={<Relatorios />} />
+            <Route path="alertas" element={<Alertas />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
