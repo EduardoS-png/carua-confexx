@@ -45,10 +45,10 @@ const Index = () => {
             </p>
             <div className="flex flex-wrap gap-3">
               <Button asChild variant="hero" size="xl">
-                <Link to="/cadastro">Começar agora <ArrowRight /></Link>
+                <Link to="/cadastro">Criar conta grátis <ArrowRight /></Link>
               </Button>
               <Button asChild variant="outline" size="xl">
-                <Link to="/marketplace">Ver profissionais</Link>
+                <Link to="/login">Já tenho conta</Link>
               </Button>
             </div>
             <div className="flex flex-wrap items-center gap-6 pt-2 text-sm text-muted-foreground">
@@ -261,9 +261,14 @@ const Index = () => {
               <p className="mx-auto mt-4 max-w-2xl text-primary-foreground/90">
                 Grátis para começar. Sem complicação. Pronto pro chão da fábrica.
               </p>
-              <Button asChild size="xl" variant="secondary" className="mt-8 bg-background text-primary hover:bg-background/90">
-                <Link to="/cadastro">Testar gratuitamente <ArrowRight /></Link>
-              </Button>
+              <div className="mt-8 flex flex-wrap justify-center gap-3">
+                <Button asChild size="xl" variant="secondary" className="bg-background text-primary hover:bg-background/90">
+                  <Link to="/cadastro">Criar conta grátis <ArrowRight /></Link>
+                </Button>
+                <Button asChild size="xl" variant="outline" className="border-background/40 bg-transparent text-primary-foreground hover:bg-background/10">
+                  <Link to="/login">Entrar</Link>
+                </Button>
+              </div>
             </div>
           </div>
         </div>
