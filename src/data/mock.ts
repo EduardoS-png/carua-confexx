@@ -33,6 +33,8 @@ export interface Material {
 
 export type TipoMovimento = "entrada" | "saida";
 
+export type VinculoTipo = "pedido" | "membro" | "nenhum";
+
 export interface MovimentoMaterial {
   id: string;
   materialId: string;
@@ -40,6 +42,7 @@ export interface MovimentoMaterial {
   quantidade: number;
   observacao?: string;
   pedidoId?: string;
+  membroId?: string; // se o material foi entregue / devolvido por um membro da equipe
   data: string;
 }
 
