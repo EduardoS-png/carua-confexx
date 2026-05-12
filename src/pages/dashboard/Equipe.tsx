@@ -1,12 +1,20 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Phone, Calendar, Scissors, Power } from "lucide-react";
-import { equipe as inicial, pedidos, type MembroEquipe, type EtapaProducao } from "@/data/mock";
+import { Plus, Phone, Calendar, Scissors, Power, Store, ExternalLink, Star } from "lucide-react";
+import {
+  equipe as inicial,
+  pedidos,
+  contratadosMarketplace,
+  profissionais,
+  type MembroEquipe,
+  type EtapaProducao,
+} from "@/data/mock";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { toast } from "sonner";
 
@@ -100,10 +108,15 @@ const Equipe = () => {
       />
 
       <div className="rounded-xl border border-primary/15 bg-primary/5 p-4 text-sm text-foreground">
-        <strong className="font-display text-primary">Equipe interna</strong> é diferente do{" "}
-        <strong>Marketplace</strong>: aqui você gerencia quem trabalha dentro da sua facção. O marketplace
-        é a vitrine pública de profissionais autônomos do agreste.
+        <strong className="font-display text-primary">Equipe fixa</strong> são as pessoas contratadas pela facção.
+        Mais abaixo você vê os <strong>profissionais contratados pontualmente via marketplace</strong> — eles ajudam em pedidos específicos sem fazer parte do quadro fixo.
       </div>
+
+      <div>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="heading-display text-xl">Equipe fixa da facção</h2>
+          <Badge variant="outline" className="border-primary/30 bg-primary/5 text-primary">{lista.length} pessoas</Badge>
+        </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {lista.map((m) => {
@@ -157,6 +170,79 @@ const Equipe = () => {
             </Card>
           );
         })}
+        </div>
+      </div>
+
+      {/* Contratados via Marketplace — separado da equipe fixa */}
+      <div>
+        <div className="mb-4 flex items-end justify-between gap-3">
+          <div>
+            <h2 className="heading-display flex items-center gap-2 text-xl">
+              <Store className="h-5 w-5 text-accent" /> Contratados via marketplace
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              Profissionais autônomos contratados para serviços pontuais. Não fazem parte da equipe fixa.
+            </p>
+          </div>
+          <Button asChild variant="outline" size="sm">
+            <Link to="/marketplace"><ExternalLink className="h-4 w-4" /> Buscar profissionais</Link>
+          </Button>
+        </div>
+
+        {contratadosMarketplace.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
+            Nenhum profissional contratado no marketplace ainda.
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {contratadosMarketplace.map((c) => {
+              const prof = profissionais.find((p) => p.id === c.profissionalId);
+              if (!prof) return null;
+              const statusCfg = {
+                negociando: { label: "Negociando", cls: "border-warning/30 bg-warning/10 text-warning" },
+                em_andamento: { label: "Em andamento", cls: "border-primary/30 bg-primary/10 text-primary" },
+                concluido: { label: "Concluído", cls: "border-success/30 bg-success/10 text-success" },
+              }[c.status];
+              return (
+                <Card key={c.id} className="border-accent/20 shadow-soft">
+                  <CardContent className="p-5">
+                    <div className="flex items-start gap-3">
+                      <img src={prof.foto} alt={prof.nome} className="h-12 w-12 rounded-full object-cover" />
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-display text-base font-semibold leading-tight">{prof.nome}</h3>
+                        <p className="text-xs text-primary">{prof.especialidade}</p>
+                        <p className="mt-0.5 flex items-center gap-1 text-[11px] text-muted-foreground">
+                          <Star className="h-3 w-3 fill-warning text-warning" /> {prof.avaliacao} · {prof.cidade}
+                        </p>
+                      </div>
+                      <Badge variant="outline" className={statusCfg.cls}>{statusCfg.label}</Badge>
+                    </div>
+
+                    <div className="mt-4 rounded-lg bg-surface p-3 text-xs">
+                      <p className="font-semibold text-foreground">{c.servico}</p>
+                      {c.pedidoId && <p className="mt-1 text-muted-foreground">Pedido <span className="font-mono text-primary">{c.pedidoId}</span></p>}
+                    </div>
+
+                    <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+                      <div className="rounded-lg bg-surface p-2">
+                        <p className="text-muted-foreground">Valor</p>
+                        <p className="font-display text-base font-bold text-primary">R$ {c.valorAcordado.toLocaleString("pt-BR")}</p>
+                      </div>
+                      <div className="rounded-lg bg-surface p-2">
+                        <p className="text-muted-foreground">Entrega</p>
+                        <p className="font-display text-base font-bold">{new Date(c.prazoEntrega).toLocaleDateString("pt-BR")}</p>
+                      </div>
+                    </div>
+
+                    <Button asChild variant="soft" size="sm" className="mt-3 w-full">
+                      <Link to={`/marketplace/${prof.id}`}>Ver perfil <ExternalLink className="h-3.5 w-3.5" /></Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

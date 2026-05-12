@@ -33,6 +33,8 @@ export interface Material {
 
 export type TipoMovimento = "entrada" | "saida";
 
+export type VinculoTipo = "pedido" | "membro" | "nenhum";
+
 export interface MovimentoMaterial {
   id: string;
   materialId: string;
@@ -40,6 +42,7 @@ export interface MovimentoMaterial {
   quantidade: number;
   observacao?: string;
   pedidoId?: string;
+  membroId?: string; // se o material foi entregue / devolvido por um membro da equipe
   data: string;
 }
 
@@ -69,6 +72,26 @@ export interface Profissional {
   portfolio: string[];
   pedidosConcluidos: number;
   avaliacao: number;
+  experienciaAnos: number;
+  capacidadePecasMes: number;
+  formaPagamento: string[]; // PIX, dinheiro, etc
+  atendeRemoto: boolean;
+  certificacoes?: string[];
+  maquinario?: string[];
+  contato: { telefone: string; email?: string };
+  disponibilidade: "imediata" | "1_semana" | "2_semanas" | "agendar";
+}
+
+// Profissionais do marketplace contratados pela facção (separado da equipe fixa)
+export interface ContratadoMarketplace {
+  id: string;
+  profissionalId: string;
+  pedidoId?: string;
+  servico: string;
+  status: "negociando" | "em_andamento" | "concluido";
+  valorAcordado: number;
+  prazoEntrega: string;
+  contratadoEm: string;
 }
 
 export const equipe: MembroEquipe[] = [
@@ -209,6 +232,14 @@ export const profissionais: Profissional[] = [
     portfolio: ["Lote 200 camisetas — Loja Mariposa", "Uniforme escolar — Colégio Sertão", "Linha verão 2025"],
     pedidosConcluidos: 142,
     avaliacao: 4.9,
+    experienciaAnos: 22,
+    capacidadePecasMes: 600,
+    formaPagamento: ["PIX", "Dinheiro"],
+    atendeRemoto: true,
+    certificacoes: ["SENAI - Costura industrial"],
+    maquinario: ["Reta industrial", "Overlock", "Galoneira"],
+    contato: { telefone: "(81) 98888-1010", email: "maria.gracas@email.com" },
+    disponibilidade: "1_semana",
   },
   {
     id: "p2",
@@ -223,6 +254,14 @@ export const profissionais: Profissional[] = [
     portfolio: ["Modelagem jeans masculino", "Encaixe otimizado lote 500 peças"],
     pedidosConcluidos: 98,
     avaliacao: 4.8,
+    experienciaAnos: 15,
+    capacidadePecasMes: 1500,
+    formaPagamento: ["PIX", "Boleto"],
+    atendeRemoto: false,
+    certificacoes: ["SENAI - Modelagem CAD"],
+    maquinario: ["Mesa de corte 3m", "Máquina de corte vertical"],
+    contato: { telefone: "(81) 98888-2020", email: "joao.modelagem@email.com" },
+    disponibilidade: "imediata",
   },
   {
     id: "p3",
@@ -237,6 +276,13 @@ export const profissionais: Profissional[] = [
     portfolio: ["Acabamento vestidos festa", "Bainha lote 300 calças"],
     pedidosConcluidos: 67,
     avaliacao: 5.0,
+    experienciaAnos: 8,
+    capacidadePecasMes: 800,
+    formaPagamento: ["PIX"],
+    atendeRemoto: true,
+    maquinario: ["Overlock", "Caseadeira"],
+    contato: { telefone: "(81) 98888-3030" },
+    disponibilidade: "imediata",
   },
   {
     id: "p4",
@@ -251,5 +297,36 @@ export const profissionais: Profissional[] = [
     portfolio: ["Coleção festas juninas", "Renda renascença para vestidos"],
     pedidosConcluidos: 53,
     avaliacao: 5.0,
+    experienciaAnos: 35,
+    capacidadePecasMes: 120,
+    formaPagamento: ["PIX", "Dinheiro"],
+    atendeRemoto: false,
+    certificacoes: ["Mestra em Renda Renascença - SEBRAE"],
+    contato: { telefone: "(81) 98888-4040" },
+    disponibilidade: "2_semanas",
   },
 ];
+
+export const contratadosMarketplace: ContratadoMarketplace[] = [
+  {
+    id: "ct1",
+    profissionalId: "p2",
+    pedidoId: "LT-2403",
+    servico: "Modelagem e corte em escala",
+    status: "em_andamento",
+    valorAcordado: 960,
+    prazoEntrega: "2026-05-10",
+    contratadoEm: "2026-04-28",
+  },
+  {
+    id: "ct2",
+    profissionalId: "p4",
+    pedidoId: "LT-2402",
+    servico: "Bordado de detalhes — 40 vestidos",
+    status: "concluido",
+    valorAcordado: 1000,
+    prazoEntrega: "2026-04-25",
+    contratadoEm: "2026-04-12",
+  },
+];
+

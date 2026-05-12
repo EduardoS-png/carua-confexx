@@ -6,7 +6,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Star, MapPin, Search, Clock, ArrowRight } from "lucide-react";
+import { Star, MapPin, Search, Clock, ArrowRight, Award, Package, CheckCircle2 } from "lucide-react";
 import { profissionais } from "@/data/mock";
 import patternImg from "@/assets/pattern-chita.jpg";
 
@@ -50,12 +50,23 @@ const Marketplace = () => {
         <div className="container">
           <p className="mb-6 text-sm text-muted-foreground">{lista.length} profissionais disponíveis</p>
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {lista.map((p) => (
+            {lista.map((p) => {
+              const dispLabel = {
+                imediata: "Disponível agora",
+                "1_semana": "Em até 1 semana",
+                "2_semanas": "Em até 2 semanas",
+                agendar: "Agendar",
+              }[p.disponibilidade];
+              const dispCor = p.disponibilidade === "imediata" ? "text-success" : "text-accent";
+              return (
               <Card key={p.id} className="overflow-hidden shadow-soft transition-all hover:-translate-y-1 hover:shadow-warm">
                 <div className="relative aspect-[4/3] overflow-hidden bg-surface">
                   <img src={p.foto} alt={p.nome} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 hover:scale-105" />
-                  <div className="absolute right-3 top-3 rounded-full bg-card/90 px-2.5 py-1 text-xs font-semibold backdrop-blur">
-                    <span className="flex items-center gap-1"><Star className="h-3 w-3 fill-warning text-warning" /> {p.avaliacao}</span>
+                  <div className="absolute right-3 top-3 rounded-full bg-card/95 px-2.5 py-1 text-xs font-semibold backdrop-blur">
+                    <span className="flex items-center gap-1"><Star className="h-3 w-3 fill-warning text-warning" /> {p.avaliacao} <span className="text-muted-foreground">({p.pedidosConcluidos})</span></span>
+                  </div>
+                  <div className={`absolute left-3 top-3 rounded-full bg-card/95 px-2.5 py-1 text-[11px] font-semibold backdrop-blur ${dispCor}`}>
+                    <span className="flex items-center gap-1"><CheckCircle2 className="h-3 w-3" /> {dispLabel}</span>
                   </div>
                 </div>
                 <CardContent className="p-5">
@@ -64,6 +75,12 @@ const Marketplace = () => {
                   <p className="mt-1 flex items-center gap-1 text-xs text-muted-foreground">
                     <MapPin className="h-3 w-3" /> {p.cidade}
                   </p>
+
+                  <div className="mt-3 grid grid-cols-2 gap-2 rounded-lg bg-surface/60 p-2.5 text-xs">
+                    <div className="flex items-center gap-1.5"><Award className="h-3.5 w-3.5 text-primary" /> {p.experienciaAnos} anos exp.</div>
+                    <div className="flex items-center gap-1.5"><Package className="h-3.5 w-3.5 text-accent" /> {p.capacidadePecasMes}/mês</div>
+                  </div>
+
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {p.servicos.slice(0, 3).map((s) => (
                       <Badge key={s} variant="outline" className="border-primary/20 bg-surface text-xs">{s}</Badge>
@@ -72,11 +89,11 @@ const Marketplace = () => {
                   <div className="mt-4 flex items-center justify-between border-t border-border pt-3 text-sm">
                     <div>
                       <p className="text-xs text-muted-foreground">A partir de</p>
-                      <p className="font-display text-lg font-bold text-primary">R$ {p.precoBase}</p>
+                      <p className="font-display text-lg font-bold text-primary">R$ {p.precoBase}<span className="text-xs font-normal text-muted-foreground">/peça</span></p>
                     </div>
                     <div className="text-right">
                       <p className="text-xs text-muted-foreground">Prazo médio</p>
-                      <p className="flex items-center justify-end gap-1 text-sm font-semibold"><Clock className="h-3.5 w-3.5" /> {p.prazoMedioDias}d</p>
+                      <p className="flex items-center justify-end gap-1 text-sm font-semibold"><Clock className="h-3.5 w-3.5" /> {p.prazoMedioDias} dias</p>
                     </div>
                   </div>
                   <Button asChild variant="hero" className="mt-4 w-full">
@@ -84,7 +101,8 @@ const Marketplace = () => {
                   </Button>
                 </CardContent>
               </Card>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
