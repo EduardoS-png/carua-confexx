@@ -108,10 +108,15 @@ const Equipe = () => {
       />
 
       <div className="rounded-xl border border-primary/15 bg-primary/5 p-4 text-sm text-foreground">
-        <strong className="font-display text-primary">Equipe interna</strong> é diferente do{" "}
-        <strong>Marketplace</strong>: aqui você gerencia quem trabalha dentro da sua facção. O marketplace
-        é a vitrine pública de profissionais autônomos do agreste.
+        <strong className="font-display text-primary">Equipe fixa</strong> são as pessoas contratadas pela facção.
+        Mais abaixo você vê os <strong>profissionais contratados pontualmente via marketplace</strong> — eles ajudam em pedidos específicos sem fazer parte do quadro fixo.
       </div>
+
+      <div>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="heading-display text-xl">Equipe fixa da facção</h2>
+          <Badge variant="outline" className="border-primary/30 bg-primary/5 text-primary">{lista.length} pessoas</Badge>
+        </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {lista.map((m) => {
