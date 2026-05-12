@@ -72,6 +72,26 @@ export interface Profissional {
   portfolio: string[];
   pedidosConcluidos: number;
   avaliacao: number;
+  experienciaAnos: number;
+  capacidadePecasMes: number;
+  formaPagamento: string[]; // PIX, dinheiro, etc
+  atendeRemoto: boolean;
+  certificacoes?: string[];
+  maquinario?: string[];
+  contato: { telefone: string; email?: string };
+  disponibilidade: "imediata" | "1_semana" | "2_semanas" | "agendar";
+}
+
+// Profissionais do marketplace contratados pela facção (separado da equipe fixa)
+export interface ContratadoMarketplace {
+  id: string;
+  profissionalId: string;
+  pedidoId?: string;
+  servico: string;
+  status: "negociando" | "em_andamento" | "concluido";
+  valorAcordado: number;
+  prazoEntrega: string;
+  contratadoEm: string;
 }
 
 export const equipe: MembroEquipe[] = [
