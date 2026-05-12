@@ -1,12 +1,20 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Phone, Calendar, Scissors, Power } from "lucide-react";
-import { equipe as inicial, pedidos, type MembroEquipe, type EtapaProducao } from "@/data/mock";
+import { Plus, Phone, Calendar, Scissors, Power, Store, ExternalLink, Star } from "lucide-react";
+import {
+  equipe as inicial,
+  pedidos,
+  contratadosMarketplace,
+  profissionais,
+  type MembroEquipe,
+  type EtapaProducao,
+} from "@/data/mock";
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { toast } from "sonner";
 
