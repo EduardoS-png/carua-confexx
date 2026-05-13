@@ -132,13 +132,39 @@ const Cadastro = () => {
               </p>
             </div>
 
+            {/* Tipo de conta */}
+            <div className="grid grid-cols-2 gap-2 rounded-2xl bg-surface/40 p-1.5">
+              {([
+                { v: "faccao", icon: Building2, label: "Sou facção", sub: "Gerencio produção" },
+                { v: "profissional", icon: UserCircle2, label: "Sou profissional", sub: "Vendo meu trabalho" },
+              ] as const).map((opt) => {
+                const active = tipo === opt.v;
+                return (
+                  <button
+                    type="button"
+                    key={opt.v}
+                    onClick={() => setTipo(opt.v)}
+                    className={`flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all ${
+                      active
+                        ? "border-primary bg-background shadow-soft"
+                        : "border-transparent bg-transparent text-muted-foreground hover:bg-background/50"
+                    }`}
+                  >
+                    <opt.icon className={`h-4 w-4 ${active ? "text-primary" : ""}`} />
+                    <span className={`text-sm font-semibold ${active ? "text-foreground" : ""}`}>{opt.label}</span>
+                    <span className="text-[11px] text-muted-foreground">{opt.sub}</span>
+                  </button>
+                );
+              })}
+            </div>
+
             <form onSubmit={handleCadastro} className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className={`grid gap-4 ${tipo === "faccao" ? "sm:grid-cols-2" : ""}`}>
                 <div className="space-y-2">
                   <Label htmlFor="nome" className={labelClasses("nome")}>Seu nome</Label>
                   <Input
                     id="nome"
-                    placeholder="Maria das Graças"
+                    placeholder={tipo === "faccao" ? "Maria das Graças" : "Maria das Graças"}
                     value={nome}
                     onChange={(e) => setNome(e.target.value)}
                     onFocus={() => setFocused("nome")}
@@ -146,18 +172,20 @@ const Cadastro = () => {
                     className={inputClasses("nome")}
                   />
                 </div>
-                <div className="space-y-2">
-                  <Label htmlFor="confeccao" className={labelClasses("confeccao")}>Confecção</Label>
-                  <Input
-                    id="confeccao"
-                    placeholder="Confecção Sertão"
-                    value={nomeConfeccao}
-                    onChange={(e) => setNomeConfeccao(e.target.value)}
-                    onFocus={() => setFocused("confeccao")}
-                    onBlur={() => setFocused(null)}
-                    className={inputClasses("confeccao")}
-                  />
-                </div>
+                {tipo === "faccao" && (
+                  <div className="space-y-2">
+                    <Label htmlFor="confeccao" className={labelClasses("confeccao")}>Confecção</Label>
+                    <Input
+                      id="confeccao"
+                      placeholder="Confecção Sertão"
+                      value={nomeConfeccao}
+                      onChange={(e) => setNomeConfeccao(e.target.value)}
+                      onFocus={() => setFocused("confeccao")}
+                      onBlur={() => setFocused(null)}
+                      className={inputClasses("confeccao")}
+                    />
+                  </div>
+                )}
               </div>
 
               <div className="space-y-2">
