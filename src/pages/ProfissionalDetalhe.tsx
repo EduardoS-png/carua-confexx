@@ -1,16 +1,34 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, MapPin, Clock, ArrowLeft, MessageSquare, Briefcase, Award, Package, Phone, Mail, Wrench, CheckCircle2, CreditCard } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Star, MapPin, Clock, ArrowLeft, MessageSquare, Briefcase, Award, Package, Phone, Mail, Wrench, CheckCircle2, CreditCard, Send } from "lucide-react";
 import { profissionais } from "@/data/mock";
+import { useToast } from "@/hooks/use-toast";
 import patternImg from "@/assets/pattern-chita.jpg";
 
 const ProfissionalDetalhe = () => {
   const { id } = useParams();
   const p = profissionais.find((x) => x.id === id);
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ servico: "", quantidade: "", valor: "", prazo: "", mensagem: "" });
+  const enviar = () => {
+    if (!form.servico || !form.quantidade || !form.prazo) {
+      toast({ title: "Preencha os campos principais", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Pedido enviado 🎉", description: `${p?.nome} vai receber sua proposta.` });
+    setOpen(false);
+    setForm({ servico: "", quantidade: "", valor: "", prazo: "", mensagem: "" });
+  };
 
   if (!p) {
     return (
