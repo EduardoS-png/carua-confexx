@@ -1,16 +1,34 @@
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { Star, MapPin, Clock, ArrowLeft, MessageSquare, Briefcase, Award, Package, Phone, Mail, Wrench, CheckCircle2, CreditCard } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Star, MapPin, Clock, ArrowLeft, MessageSquare, Briefcase, Award, Package, Phone, Mail, Wrench, CheckCircle2, CreditCard, Send } from "lucide-react";
 import { profissionais } from "@/data/mock";
+import { useToast } from "@/hooks/use-toast";
 import patternImg from "@/assets/pattern-chita.jpg";
 
 const ProfissionalDetalhe = () => {
   const { id } = useParams();
   const p = profissionais.find((x) => x.id === id);
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ servico: "", quantidade: "", valor: "", prazo: "", mensagem: "" });
+  const enviar = () => {
+    if (!form.servico || !form.quantidade || !form.prazo) {
+      toast({ title: "Preencha os campos principais", variant: "destructive" });
+      return;
+    }
+    toast({ title: "Pedido enviado 🎉", description: `${p?.nome} vai receber sua proposta.` });
+    setOpen(false);
+    setForm({ servico: "", quantidade: "", valor: "", prazo: "", mensagem: "" });
+  };
 
   if (!p) {
     return (
@@ -54,8 +72,8 @@ const ProfissionalDetalhe = () => {
               <p className="mt-5 max-w-2xl text-lg text-foreground">{p.bio}</p>
 
               <div className="mt-6 flex flex-wrap gap-3">
-                <Button variant="hero" size="lg"><MessageSquare /> Entrar em contato</Button>
-                <Button variant="outline" size="lg">Solicitar orçamento</Button>
+                <Button variant="hero" size="lg" onClick={() => setOpen(true)}><Send /> Solicitar conexão</Button>
+                <Button variant="outline" size="lg" onClick={() => setOpen(true)}><MessageSquare /> Enviar proposta</Button>
               </div>
             </div>
           </div>
@@ -149,7 +167,7 @@ const ProfissionalDetalhe = () => {
               <CardContent className="p-5">
                 <p className="text-xs uppercase tracking-wider text-muted-foreground">A partir de</p>
                 <p className="font-display text-3xl font-bold text-primary">R$ {p.precoBase}<span className="text-base font-normal text-muted-foreground">/peça</span></p>
-                <Button variant="hero" size="lg" className="mt-4 w-full"><MessageSquare /> Solicitar orçamento</Button>
+                <Button variant="hero" size="lg" className="mt-4 w-full" onClick={() => setOpen(true)}><Send /> Solicitar conexão</Button>
                 <p className="mt-3 text-center text-xs text-muted-foreground">Resposta em até 24h</p>
               </CardContent>
             </Card>
@@ -181,6 +199,45 @@ const ProfissionalDetalhe = () => {
           </aside>
         </div>
       </section>
+
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Solicitar conexão com {p?.nome}</DialogTitle>
+            <DialogDescription>
+              Envie uma proposta. {p?.nome.split(" ")[0]} responde em até 24h.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label>Serviço desejado</Label>
+              <Input value={form.servico} onChange={(e) => setForm({ ...form, servico: e.target.value })} placeholder="Ex: Costura de 100 camisetas" />
+            </div>
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <Label>Quantidade</Label>
+                <Input type="number" value={form.quantidade} onChange={(e) => setForm({ ...form, quantidade: e.target.value })} />
+              </div>
+              <div>
+                <Label>Valor (R$)</Label>
+                <Input type="number" value={form.valor} onChange={(e) => setForm({ ...form, valor: e.target.value })} />
+              </div>
+              <div>
+                <Label>Prazo</Label>
+                <Input type="date" value={form.prazo} onChange={(e) => setForm({ ...form, prazo: e.target.value })} />
+              </div>
+            </div>
+            <div>
+              <Label>Mensagem</Label>
+              <Textarea rows={4} value={form.mensagem} onChange={(e) => setForm({ ...form, mensagem: e.target.value })} placeholder="Conte mais sobre o trabalho..." />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setOpen(false)}>Cancelar</Button>
+            <Button variant="hero" onClick={enviar}><Send /> Enviar pedido</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <SiteFooter />
     </div>
