@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Logo } from "@/components/site/Logo";
-import { Eye, EyeOff, ArrowRight, Check, Scissors, BarChart3, Users } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, Check, Scissors, BarChart3, Users, Building2, UserCircle2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import heroImg from "@/assets/hero-textile.jpg";
 
+type Tipo = "faccao" | "profissional";
+
 const Cadastro = () => {
+  const [tipo, setTipo] = useState<Tipo>("faccao");
   const [nome, setNome] = useState("");
   const [nomeConfeccao, setNomeConfeccao] = useState("");
   const [email, setEmail] = useState("");
@@ -23,7 +26,8 @@ const Cadastro = () => {
 
   const handleCadastro = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nome || !email || !senha || !nomeConfeccao) {
+    const segundoCampoOk = tipo === "faccao" ? !!nomeConfeccao : true;
+    if (!nome || !email || !senha || !segundoCampoOk) {
       toast({ title: "Erro", description: "Preencha todos os campos.", variant: "destructive" });
       return;
     }
@@ -34,8 +38,11 @@ const Cadastro = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      toast({ title: "Conta criada! 🎉", description: "Bem-vindo(a) ao Caruá Confex." });
-      navigate("/app");
+      toast({
+        title: "Conta criada! 🎉",
+        description: tipo === "faccao" ? "Bem-vindo(a) ao painel da sua confecção." : "Sua área profissional está pronta.",
+      });
+      navigate(tipo === "faccao" ? "/app" : "/pro");
     }, 1000);
   };
 
