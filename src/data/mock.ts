@@ -330,3 +330,164 @@ export const contratadosMarketplace: ContratadoMarketplace[] = [
   },
 ];
 
+
+// ============================================================
+// Lado do PROFISSIONAL AUTÔNOMO (marketplace)
+// ============================================================
+
+export type StatusPedidoConexao = "pendente" | "negociando" | "aceito" | "recusado" | "concluido";
+
+export interface PedidoConexao {
+  id: string;
+  profissionalId: string;
+  faccaoNome: string;
+  faccaoCidade: string;
+  faccaoResponsavel: string;
+  servico: string;
+  quantidade: number;
+  valorProposto: number;
+  prazo: string;
+  mensagem: string;
+  status: StatusPedidoConexao;
+  recebidoEm: string;
+  contraproposta?: { valor: number; prazo: string; observacao?: string };
+}
+
+export interface ItemPortfolio {
+  id: string;
+  profissionalId: string;
+  titulo: string;
+  descricao: string;
+  cliente?: string;
+  ano: number;
+  imagem: string;
+}
+
+// Profissional "logado" no MVP do dashboard do autônomo
+export const PROFISSIONAL_LOGADO_ID = "p1";
+
+export const pedidosConexao: PedidoConexao[] = [
+  {
+    id: "PC-001",
+    profissionalId: "p1",
+    faccaoNome: "Confecção Sertão",
+    faccaoCidade: "Caruaru, PE",
+    faccaoResponsavel: "Antônio Silva",
+    servico: "Costura — camiseta básica em malha",
+    quantidade: 200,
+    valorProposto: 1600,
+    prazo: "2026-05-25",
+    mensagem: "Olá Maria! Vimos seu portfólio e gostaríamos de fechar um lote de 200 camisetas. Conseguimos enviar o tecido cortado.",
+    status: "pendente",
+    recebidoEm: "2026-05-12",
+  },
+  {
+    id: "PC-002",
+    profissionalId: "p1",
+    faccaoNome: "Atelier Rosa",
+    faccaoCidade: "Toritama, PE",
+    faccaoResponsavel: "Rosângela Lima",
+    servico: "Costura de vestidos floral — produção pequena",
+    quantidade: 40,
+    valorProposto: 880,
+    prazo: "2026-05-30",
+    mensagem: "Bom dia! Estou montando uma coleção e preciso de alguém de confiança para os vestidos. Pode ser?",
+    status: "pendente",
+    recebidoEm: "2026-05-11",
+  },
+  {
+    id: "PC-003",
+    profissionalId: "p1",
+    faccaoNome: "Boutique Lírio",
+    faccaoCidade: "Santa Cruz do Capibaribe, PE",
+    faccaoResponsavel: "Patrícia Mendes",
+    servico: "Costura blusa rendada",
+    quantidade: 60,
+    valorProposto: 720,
+    prazo: "2026-06-05",
+    mensagem: "Oi Maria, gostaria de negociar valor. Posso pagar R$ 12 a peça.",
+    status: "negociando",
+    recebidoEm: "2026-05-08",
+    contraproposta: { valor: 900, prazo: "2026-06-08", observacao: "R$15/peça e +3 dias para garantir o acabamento" },
+  },
+  {
+    id: "PC-004",
+    profissionalId: "p1",
+    faccaoNome: "Loja Mariposa",
+    faccaoCidade: "Recife, PE",
+    faccaoResponsavel: "Carla Souza",
+    servico: "Lote 120 camisetas brancas",
+    quantidade: 120,
+    valorProposto: 1020,
+    prazo: "2026-05-20",
+    mensagem: "Fechado nas condições combinadas. Aguardando início.",
+    status: "aceito",
+    recebidoEm: "2026-04-28",
+  },
+  {
+    id: "PC-005",
+    profissionalId: "p1",
+    faccaoNome: "Maria Bonita Modas",
+    faccaoCidade: "Caruaru, PE",
+    faccaoResponsavel: "Júlia Andrade",
+    servico: "Saia midi — 30 peças",
+    quantidade: 30,
+    valorProposto: 480,
+    prazo: "2026-04-30",
+    mensagem: "Trabalho entregue. Obrigada pelo capricho!",
+    status: "concluido",
+    recebidoEm: "2026-04-05",
+  },
+  {
+    id: "PC-006",
+    profissionalId: "p1",
+    faccaoNome: "Confecção Vale",
+    faccaoCidade: "Toritama, PE",
+    faccaoResponsavel: "Marcos Pereira",
+    servico: "Bordado em uniforme escolar",
+    quantidade: 50,
+    valorProposto: 250,
+    prazo: "2026-04-20",
+    mensagem: "Não vai dar dessa vez, valor abaixo do meu mínimo.",
+    status: "recusado",
+    recebidoEm: "2026-04-02",
+  },
+];
+
+export const portfolioItens: ItemPortfolio[] = [
+  {
+    id: "po1",
+    profissionalId: "p1",
+    titulo: "Lote 200 camisetas — Loja Mariposa",
+    descricao: "Produção em malha 100% algodão, costura reta com overlock. Entrega em 7 dias.",
+    cliente: "Loja Mariposa",
+    ano: 2025,
+    imagem: pro1,
+  },
+  {
+    id: "po2",
+    profissionalId: "p1",
+    titulo: "Uniforme escolar — Colégio Sertão",
+    descricao: "300 conjuntos com bordado do brasão. Trabalho em parceria com bordadeira local.",
+    cliente: "Colégio Sertão",
+    ano: 2025,
+    imagem: pro2,
+  },
+  {
+    id: "po3",
+    profissionalId: "p1",
+    titulo: "Linha verão 2025 — vestidos leves",
+    descricao: "60 peças em viscose com modelagem própria. Acabamento de bainha invisível.",
+    cliente: "Atelier Rosa",
+    ano: 2025,
+    imagem: pro3,
+  },
+  {
+    id: "po4",
+    profissionalId: "p1",
+    titulo: "Camisaria masculina — sob medida",
+    descricao: "Linha de 25 camisas em tricoline com botões de madrepérola.",
+    ano: 2024,
+    imagem: pro4,
+  },
+];
