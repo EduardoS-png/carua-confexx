@@ -17,6 +17,12 @@ import Relatorios from "./pages/dashboard/Relatorios.tsx";
 import Marketplace from "./pages/Marketplace.tsx";
 import ProfissionalDetalhe from "./pages/ProfissionalDetalhe.tsx";
 import Alertas from "./pages/dashboard/Alertas.tsx";
+import ProLayout from "./pages/pro/ProLayout.tsx";
+import ProHome from "./pages/pro/ProHome.tsx";
+import ProPedidos from "./pages/pro/ProPedidos.tsx";
+import ProPortfolio from "./pages/pro/ProPortfolio.tsx";
+import ProPerfil from "./pages/pro/ProPerfil.tsx";
+import ProAgenda from "./pages/pro/ProAgenda.tsx";
 
 const queryClient = new QueryClient();
 
@@ -40,6 +46,13 @@ const App = () => (
             <Route path="financeiro" element={<Financeiro />} />
             <Route path="relatorios" element={<Relatorios />} />
             <Route path="alertas" element={<Alertas />} />
+          </Route>
+          <Route path="/pro" element={<ProLayout />}>
+            <Route index element={<ProHome />} />
+            <Route path="pedidos" element={<ProPedidos />} />
+            <Route path="portfolio" element={<ProPortfolio />} />
+            <Route path="perfil" element={<ProPerfil />} />
+            <Route path="agenda" element={<ProAgenda />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
