@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/sidebar";
 import { LayoutDashboard, ClipboardList, Boxes, Users, Wallet, ArrowLeft, Store, BarChart3, Bell } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
+import { UserMenu } from "@/components/dashboard/UserMenu";
 
 const items = [
   { to: "/app", label: "Visão geral", icon: LayoutDashboard, end: true },
@@ -103,9 +104,7 @@ const DashboardLayout = () => {
             <SidebarTrigger />
             <div className="ml-auto flex items-center gap-3">
               <span className="hidden text-sm text-muted-foreground sm:inline">Olá, Dona Maria 👋</span>
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-warm font-display text-sm font-bold text-primary-foreground">
-                M
-              </div>
+              <UserMenu nome="Dona Maria" papel="Confecção Sertão · Caruaru" perfilHref="/app/perfil" iniciais="M" />
             </div>
           </header>
           <main className="flex-1 p-4 md:p-8">

@@ -7,6 +7,15 @@ import pro4 from "@/assets/pro-4.jpg";
 export type StatusEtapa = "pendente" | "em_andamento" | "concluido";
 export type EtapaProducao = "corte" | "costura" | "acabamento" | "entrega";
 
+// Etapa flexível — cada pedido pode ter seu próprio fluxo
+export interface EtapaFluxo {
+  id: string;
+  nome: string;
+  status: StatusEtapa;
+  responsavel?: string;
+  icone?: "corte" | "costura" | "acabamento" | "entrega" | "bordado" | "estampa" | "lavagem" | "embalagem" | "qualidade" | "modelagem" | "custom";
+}
+
 export interface Pedido {
   id: string;
   cliente: string;
@@ -15,11 +24,66 @@ export interface Pedido {
   prazo: string;
   valorPeca: number;
   responsavel?: string; // responsável geral (legado / coordenador)
-  responsaveisPorEtapa: Partial<Record<EtapaProducao, string>>; // quem faz cada etapa
+  responsaveisPorEtapa: Partial<Record<EtapaProducao, string>>; // quem faz cada etapa (legado)
   etapaAtual: EtapaProducao;
   etapas: Record<EtapaProducao, StatusEtapa>;
   criadoEm: string;
+  // Fluxo flexível e customizável por pedido — quando presente, sobrepõe as etapas fixas
+  fluxo?: EtapaFluxo[];
 }
+
+// Templates de fluxo de produção pré-definidos
+export const fluxoTemplates: { id: string; nome: string; descricao: string; etapas: { nome: string; icone: EtapaFluxo["icone"] }[] }[] = [
+  {
+    id: "padrao",
+    nome: "Padrão (4 etapas)",
+    descricao: "Corte → Costura → Acabamento → Entrega",
+    etapas: [
+      { nome: "Corte", icone: "corte" },
+      { nome: "Costura", icone: "costura" },
+      { nome: "Acabamento", icone: "acabamento" },
+      { nome: "Entrega", icone: "entrega" },
+    ],
+  },
+  {
+    id: "bordado",
+    nome: "Com bordado",
+    descricao: "Para uniformes e peças decoradas",
+    etapas: [
+      { nome: "Corte", icone: "corte" },
+      { nome: "Costura", icone: "costura" },
+      { nome: "Bordado", icone: "bordado" },
+      { nome: "Acabamento", icone: "acabamento" },
+      { nome: "Embalagem", icone: "embalagem" },
+      { nome: "Entrega", icone: "entrega" },
+    ],
+  },
+  {
+    id: "jeans",
+    nome: "Jeans / lavagem",
+    descricao: "Inclui lavanderia e qualidade",
+    etapas: [
+      { nome: "Modelagem", icone: "modelagem" },
+      { nome: "Corte", icone: "corte" },
+      { nome: "Costura", icone: "costura" },
+      { nome: "Lavagem", icone: "lavagem" },
+      { nome: "Qualidade", icone: "qualidade" },
+      { nome: "Entrega", icone: "entrega" },
+    ],
+  },
+  {
+    id: "estampa",
+    nome: "Com estampa",
+    descricao: "Camisetas e moletons estampados",
+    etapas: [
+      { nome: "Corte", icone: "corte" },
+      { nome: "Estampa", icone: "estampa" },
+      { nome: "Costura", icone: "costura" },
+      { nome: "Acabamento", icone: "acabamento" },
+      { nome: "Entrega", icone: "entrega" },
+    ],
+  },
+];
 
 export interface Material {
   id: string;

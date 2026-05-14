@@ -17,6 +17,7 @@ import { LayoutDashboard, ImagePlus, UserCircle2, Inbox, CalendarDays, ArrowLeft
 import { Logo } from "@/components/site/Logo";
 import { profissionais, PROFISSIONAL_LOGADO_ID, pedidosConexao } from "@/data/mock";
 import { Badge } from "@/components/ui/badge";
+import { UserMenu } from "@/components/dashboard/UserMenu";
 
 const ProSidebar = () => {
   const { state } = useSidebar();
@@ -123,7 +124,7 @@ const ProLayout = () => {
             <SidebarTrigger />
             <div className="ml-auto flex items-center gap-3">
               <span className="hidden text-sm text-muted-foreground sm:inline">Olá, {me.nome.split(" ")[0]} 👋</span>
-              <img src={me.foto} alt={me.nome} className="h-9 w-9 rounded-full object-cover ring-2 ring-border" />
+              <UserMenu nome={me.nome} papel={`${me.especialidade} · ${me.cidade}`} perfilHref="/pro/perfil" avatarUrl={me.foto} />
             </div>
           </header>
           <main className="flex-1 p-4 md:p-8">

@@ -17,6 +17,7 @@ import Relatorios from "./pages/dashboard/Relatorios.tsx";
 import Marketplace from "./pages/Marketplace.tsx";
 import ProfissionalDetalhe from "./pages/ProfissionalDetalhe.tsx";
 import Alertas from "./pages/dashboard/Alertas.tsx";
+import Perfil from "./pages/dashboard/Perfil.tsx";
 import ProLayout from "./pages/pro/ProLayout.tsx";
 import ProHome from "./pages/pro/ProHome.tsx";
 import ProPedidos from "./pages/pro/ProPedidos.tsx";
@@ -46,6 +47,7 @@ const App = () => (
             <Route path="financeiro" element={<Financeiro />} />
             <Route path="relatorios" element={<Relatorios />} />
             <Route path="alertas" element={<Alertas />} />
+            <Route path="perfil" element={<Perfil />} />
           </Route>
           <Route path="/pro" element={<ProLayout />}>
             <Route index element={<ProHome />} />
