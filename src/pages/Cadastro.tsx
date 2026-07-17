@@ -83,11 +83,13 @@ const Cadastro = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      toast({
-        title: "Conta criada! 🎉",
-        description: tipo === "faccao" ? "Bem-vindo(a) ao painel da sua confecção." : "Sua área profissional está pronta.",
-      });
-      navigate(tipo === "faccao" ? "/confeccao" : "/pro");
+      const dest = tipo === "confeccao" ? "/confeccao" : tipo === "faccao" ? "/faccao" : "/pro";
+      const desc =
+        tipo === "confeccao" ? "Painel da sua confecção pronto para coordenar a cadeia." :
+        tipo === "faccao" ? "Sua área da facção está pronta para receber lotes." :
+        "Sua área profissional está pronta.";
+      toast({ title: "Conta criada! 🎉", description: desc });
+      navigate(dest);
     }, 900);
   };
 
