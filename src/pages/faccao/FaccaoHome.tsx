@@ -27,7 +27,7 @@ const FaccaoHome = () => {
     <div className="space-y-6">
       <PageHeader
         title="Visão geral"
-        subtitle="Seus lotes em produção, prazos e avisos."
+        description="Seus lotes em produção, prazos e avisos."
       />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
