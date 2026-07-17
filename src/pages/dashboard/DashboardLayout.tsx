@@ -13,15 +13,17 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, ClipboardList, Boxes, Users, Wallet, ArrowLeft, Store, BarChart3, Bell } from "lucide-react";
+import { LayoutDashboard, ClipboardList, Boxes, Users, Wallet, ArrowLeft, Store, BarChart3, Bell, Handshake, PackageOpen } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
 import { UserMenu } from "@/components/dashboard/UserMenu";
 
 const items = [
   { to: "/confeccao", label: "Visão geral", icon: LayoutDashboard, end: true },
-  { to: "/confeccao/pedidos", label: "Pedidos", icon: ClipboardList },
+  { to: "/confeccao/pedidos", label: "Ordens de produção", icon: ClipboardList },
+  { to: "/confeccao/lotes", label: "Lotes distribuídos", icon: PackageOpen },
+  { to: "/confeccao/parceiros", label: "Parceiros produtivos", icon: Handshake },
   { to: "/confeccao/materiais", label: "Materiais", icon: Boxes },
-  { to: "/confeccao/equipe", label: "Equipe", icon: Users },
+  { to: "/confeccao/equipe", label: "Equipe interna", icon: Users },
   { to: "/confeccao/financeiro", label: "Financeiro", icon: Wallet },
   { to: "/confeccao/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/confeccao/alertas", label: "Alertas e gargalos", icon: Bell },
