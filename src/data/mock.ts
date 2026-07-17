@@ -555,3 +555,189 @@ export const portfolioItens: ItemPortfolio[] = [
     imagem: pro4,
   },
 ];
+
+// ============================================================
+// CADEIA PRODUTIVA — Parceiros e Lotes distribuídos
+// A confecção coordena. As facções e outros serviços executam.
+// ============================================================
+
+export type TipoParceiro = "faccao" | "estamparia" | "lavanderia" | "bordado" | "corte" | "revisao" | "logistica";
+
+export interface Parceiro {
+  id: string;
+  nome: string;
+  tipo: TipoParceiro;
+  cidade: string;
+  responsavel: string;
+  contato: string;
+  capacidadeMes: number;
+  avaliacao: number;
+  lotesEmAndamento: number;
+  ativo: boolean;
+  desde: string;
+}
+
+export type StatusLote = "enviado" | "em_producao" | "pronto" | "entregue" | "atrasado";
+
+export interface HistoricoLote {
+  data: string;
+  texto: string;
+  autor?: string;
+}
+
+export interface Lote {
+  id: string;
+  ordemId: string; // liga a um Pedido (ordem de produção)
+  parceiroId: string; // facção/serviço responsável
+  produto: string;
+  etapa: string; // corte, costura, bordado, lavagem...
+  quantidade: number;
+  valorPeca: number;
+  enviadoEm: string;
+  prazo: string;
+  status: StatusLote;
+  avancoPct: number;
+  observacoes?: string;
+  historico: HistoricoLote[];
+  avaliacao?: number;
+}
+
+// Facção "logada" no ambiente /faccao (MVP)
+export const FACCAO_LOGADA_ID = "f1";
+
+export const parceiros: Parceiro[] = [
+  { id: "f1", nome: "Facção Dona Maria", tipo: "faccao", cidade: "Caruaru, PE", responsavel: "Maria Souza", contato: "(81) 99911-0001", capacidadeMes: 800, avaliacao: 4.9, lotesEmAndamento: 2, ativo: true, desde: "2024-02-10" },
+  { id: "f2", nome: "Facção Sertão Costura", tipo: "faccao", cidade: "Toritama, PE", responsavel: "Antônio Silva", contato: "(81) 99911-0002", capacidadeMes: 1500, avaliacao: 4.7, lotesEmAndamento: 1, ativo: true, desde: "2024-05-22" },
+  { id: "s1", nome: "Estamparia Cores do Agreste", tipo: "estamparia", cidade: "Caruaru, PE", responsavel: "Rafael Torres", contato: "(81) 99911-0003", capacidadeMes: 3000, avaliacao: 4.8, lotesEmAndamento: 1, ativo: true, desde: "2024-09-01" },
+  { id: "s2", nome: "Lavanderia Vale do Ipojuca", tipo: "lavanderia", cidade: "Toritama, PE", responsavel: "Cláudia Rocha", contato: "(81) 99911-0004", capacidadeMes: 5000, avaliacao: 4.6, lotesEmAndamento: 1, ativo: true, desde: "2024-11-15" },
+  { id: "s3", nome: "Bordados da Dona Lurdinha", tipo: "bordado", cidade: "Caruaru, PE", responsavel: "Lurdinha Batista", contato: "(81) 99911-0005", capacidadeMes: 300, avaliacao: 5.0, lotesEmAndamento: 0, ativo: true, desde: "2025-01-08" },
+  { id: "s4", nome: "Corte Rápido Agreste", tipo: "corte", cidade: "Santa Cruz do Capibaribe, PE", responsavel: "João Pereira", contato: "(81) 99911-0006", capacidadeMes: 2500, avaliacao: 4.7, lotesEmAndamento: 0, ativo: true, desde: "2025-03-20" },
+];
+
+export const lotes: Lote[] = [
+  {
+    id: "LOTE-501",
+    ordemId: "LT-2401",
+    parceiroId: "f1",
+    produto: "Camiseta básica branca",
+    etapa: "costura",
+    quantidade: 120,
+    valorPeca: 4,
+    enviadoEm: "2026-04-24",
+    prazo: "2026-05-05",
+    status: "em_producao",
+    avancoPct: 60,
+    observacoes: "Tecido já cortado enviado no envelope 21. Costura reta + overlock.",
+    historico: [
+      { data: "2026-04-24", texto: "Lote recebido pela facção.", autor: "Maria Souza" },
+      { data: "2026-04-26", texto: "Iniciada produção (30%).", autor: "Maria Souza" },
+      { data: "2026-04-29", texto: "60% concluído.", autor: "Maria Souza" },
+    ],
+  },
+  {
+    id: "LOTE-502",
+    ordemId: "LT-2402",
+    parceiroId: "s3",
+    produto: "Vestido floral",
+    etapa: "bordado",
+    quantidade: 40,
+    valorPeca: 25,
+    enviadoEm: "2026-04-18",
+    prazo: "2026-04-30",
+    status: "atrasado",
+    avancoPct: 70,
+    observacoes: "Bordado do brasão no peito. Padrão anexado.",
+    historico: [
+      { data: "2026-04-18", texto: "Lote enviado.", autor: "Confecção" },
+      { data: "2026-04-22", texto: "Recebido, iniciando.", autor: "Lurdinha" },
+    ],
+  },
+  {
+    id: "LOTE-503",
+    ordemId: "LT-2403",
+    parceiroId: "s4",
+    produto: "Calça jeans masculina",
+    etapa: "corte",
+    quantidade: 80,
+    valorPeca: 6,
+    enviadoEm: "2026-04-28",
+    prazo: "2026-05-04",
+    status: "pronto",
+    avancoPct: 100,
+    observacoes: "Encaixe otimizado. Aguardando retirada.",
+    historico: [
+      { data: "2026-04-28", texto: "Recebido.", autor: "João" },
+      { data: "2026-05-01", texto: "Corte finalizado. Pronto para retirada.", autor: "João" },
+    ],
+  },
+  {
+    id: "LOTE-504",
+    ordemId: "LT-2403",
+    parceiroId: "s2",
+    produto: "Calça jeans masculina",
+    etapa: "lavagem",
+    quantidade: 80,
+    valorPeca: 3,
+    enviadoEm: "2026-05-02",
+    prazo: "2026-05-10",
+    status: "enviado",
+    avancoPct: 0,
+    observacoes: "Lavagem stone-washed padrão médio.",
+    historico: [{ data: "2026-05-02", texto: "Lote programado.", autor: "Confecção" }],
+  },
+  {
+    id: "LOTE-505",
+    ordemId: "LT-2404",
+    parceiroId: "f1",
+    produto: "Blusa rendada",
+    etapa: "costura",
+    quantidade: 60,
+    valorPeca: 5,
+    enviadoEm: "2026-04-12",
+    prazo: "2026-04-28",
+    status: "entregue",
+    avancoPct: 100,
+    observacoes: "Lote concluído com capricho — cliente elogiou o acabamento.",
+    historico: [
+      { data: "2026-04-12", texto: "Recebido.", autor: "Maria" },
+      { data: "2026-04-25", texto: "Concluído e entregue à confecção.", autor: "Maria" },
+    ],
+    avaliacao: 5,
+  },
+  {
+    id: "LOTE-506",
+    ordemId: "LT-2401",
+    parceiroId: "s1",
+    produto: "Camiseta básica branca",
+    etapa: "estampa",
+    quantidade: 120,
+    valorPeca: 2.5,
+    enviadoEm: "2026-05-01",
+    prazo: "2026-05-08",
+    status: "em_producao",
+    avancoPct: 40,
+    observacoes: "Estampa serigrafia — logo peito esquerdo.",
+    historico: [
+      { data: "2026-05-01", texto: "Recebido.", autor: "Rafael" },
+      { data: "2026-05-03", texto: "Setup e prova de cor OK. Rodando produção.", autor: "Rafael" },
+    ],
+  },
+];
+
+export const tipoParceiroLabel: Record<TipoParceiro, string> = {
+  faccao: "Facção",
+  estamparia: "Estamparia",
+  lavanderia: "Lavanderia",
+  bordado: "Bordado",
+  corte: "Corte",
+  revisao: "Revisão / QA",
+  logistica: "Logística",
+};
+
+export const statusLoteLabel: Record<StatusLote, string> = {
+  enviado: "Enviado — aguardando",
+  em_producao: "Em produção",
+  pronto: "Pronto para envio",
+  entregue: "Entregue",
+  atrasado: "Atrasado",
+};
