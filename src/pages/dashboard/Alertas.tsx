@@ -39,27 +39,27 @@ const Alertas = () => {
   atrasados.forEach(p => alertas.push({
     tipo: "danger", icon: XCircle, titulo: `${p.id} ATRASADO`,
     msg: `${p.cliente} · ${p.produto} — prazo era ${new Date(p.prazo).toLocaleDateString("pt-BR")}`,
-    link: "/app/pedidos",
+    link: "/confeccao/pedidos",
   }));
   urgentes.forEach(p => alertas.push({
     tipo: "warning", icon: Clock, titulo: `${p.id} vence em breve`,
     msg: `${p.cliente} · entrega em ${new Date(p.prazo).toLocaleDateString("pt-BR")}`,
-    link: "/app/pedidos",
+    link: "/confeccao/pedidos",
   }));
   semResp.forEach(p => alertas.push({
     tipo: "warning", icon: UserX, titulo: `${p.id} sem responsável`,
     msg: `Etapa ${etapaLabel[p.etapaAtual]} ainda não foi atribuída a ninguém`,
-    link: "/app/pedidos",
+    link: "/confeccao/pedidos",
   }));
   materiaisBaixos.forEach(m => alertas.push({
     tipo: "warning", icon: Boxes, titulo: `${m.nome} em falta`,
     msg: `Estoque ${m.estoque} ${m.unidade} (mínimo ${m.minimo})`,
-    link: "/app/materiais",
+    link: "/confeccao/materiais",
   }));
   gargalos.forEach(g => alertas.push({
     tipo: "info", icon: Flame, titulo: `Gargalo no ${etapaLabel[g.etapa]}`,
     msg: `${g.pedidos} pedidos para ${g.membros} membro(s) ativo(s)`,
-    link: "/app/equipe",
+    link: "/confeccao/equipe",
   }));
 
   const cores = {

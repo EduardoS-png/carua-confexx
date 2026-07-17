@@ -18,13 +18,13 @@ import { Logo } from "@/components/site/Logo";
 import { UserMenu } from "@/components/dashboard/UserMenu";
 
 const items = [
-  { to: "/app", label: "Visão geral", icon: LayoutDashboard, end: true },
-  { to: "/app/pedidos", label: "Pedidos", icon: ClipboardList },
-  { to: "/app/materiais", label: "Materiais", icon: Boxes },
-  { to: "/app/equipe", label: "Equipe", icon: Users },
-  { to: "/app/financeiro", label: "Financeiro", icon: Wallet },
-  { to: "/app/relatorios", label: "Relatórios", icon: BarChart3 },
-  { to: "/app/alertas", label: "Alertas e gargalos", icon: Bell },
+  { to: "/confeccao", label: "Visão geral", icon: LayoutDashboard, end: true },
+  { to: "/confeccao/pedidos", label: "Pedidos", icon: ClipboardList },
+  { to: "/confeccao/materiais", label: "Materiais", icon: Boxes },
+  { to: "/confeccao/equipe", label: "Equipe", icon: Users },
+  { to: "/confeccao/financeiro", label: "Financeiro", icon: Wallet },
+  { to: "/confeccao/relatorios", label: "Relatórios", icon: BarChart3 },
+  { to: "/confeccao/alertas", label: "Alertas e gargalos", icon: Bell },
 ];
 
 const AppSidebar = () => {
@@ -104,7 +104,7 @@ const DashboardLayout = () => {
             <SidebarTrigger />
             <div className="ml-auto flex items-center gap-3">
               <span className="hidden text-sm text-muted-foreground sm:inline">Olá, Dona Maria 👋</span>
-              <UserMenu nome="Dona Maria" papel="Confecção Sertão · Caruaru" perfilHref="/app/perfil" iniciais="M" />
+              <UserMenu nome="Dona Maria" papel="Confecção Sertão · Caruaru" perfilHref="/confeccao/perfil" iniciais="M" />
             </div>
           </header>
           <main className="flex-1 p-4 md:p-8">

@@ -24,7 +24,7 @@ const Login = () => {
       setLoading(false);
       if (email && senha) {
         toast({ title: "Bem-vindo(a) de volta!", description: "Login realizado com sucesso." });
-        navigate("/app");
+        navigate("/confeccao");
       } else {
         toast({ title: "Erro", description: "Preencha todos os campos.", variant: "destructive" });
       }

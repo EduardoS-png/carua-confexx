@@ -87,7 +87,7 @@ const Cadastro = () => {
         title: "Conta criada! 🎉",
         description: tipo === "faccao" ? "Bem-vindo(a) ao painel da sua confecção." : "Sua área profissional está pronta.",
       });
-      navigate(tipo === "faccao" ? "/app" : "/pro");
+      navigate(tipo === "faccao" ? "/confeccao" : "/pro");
     }, 900);
   };
 
