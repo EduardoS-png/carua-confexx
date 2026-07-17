@@ -189,7 +189,8 @@ const Cadastro = () => {
                 </div>
                 <div className="grid gap-3">
                   {([
-                    { v: "faccao", icon: Building2, label: "Sou uma facção", sub: "Quero gerenciar produção, equipe e estoque", chips: ["Pedidos em lote", "Equipe", "Marketplace"] },
+                    { v: "confeccao", icon: Building2, label: "Sou uma confecção", sub: "Coordeno a produção e distribuo lotes para facções e serviços", chips: ["Ordens", "Lotes", "Parceiros"] },
+                    { v: "faccao", icon: Building2, label: "Sou uma facção / serviço", sub: "Executo etapas (costura, corte, bordado, lavagem, estampa)", chips: ["Lotes recebidos", "Andamento", "Histórico"] },
                     { v: "profissional", icon: UserCircle2, label: "Sou profissional autônomo", sub: "Quero divulgar meu trabalho e receber pedidos", chips: ["Portfólio", "Pedidos", "Agenda"] },
                   ] as const).map((opt) => {
                     const active = tipo === opt.v;
