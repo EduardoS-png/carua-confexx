@@ -111,9 +111,9 @@ const Cadastro = () => {
             <h1 className="font-display text-4xl font-extrabold leading-[1.1] text-white">
               {etapa === 1 && <>Comece sua jornada<br /><span className="text-orange-300">em 4 passos.</span></>}
               {etapa === 2 && <>Quem é você?<br /><span className="text-orange-300">Conte-nos.</span></>}
-              {etapa === 3 && (tipo === "faccao"
-                ? <>Sobre sua<br /><span className="text-orange-300">confecção.</span></>
-                : <>Seu trabalho,<br /><span className="text-orange-300">seu portfólio.</span></>)}
+              {etapa === 3 && (tipo === "profissional"
+                ? <>Seu trabalho,<br /><span className="text-orange-300">seu portfólio.</span></>
+                : <>Sobre sua<br /><span className="text-orange-300">{tipo === "confeccao" ? "confecção." : "facção."}</span></>)}
               {etapa === 4 && <>Quase lá!<br /><span className="text-orange-300">Proteja sua conta.</span></>}
             </h1>
             <p className="text-base leading-relaxed text-white/85">
