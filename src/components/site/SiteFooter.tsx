@@ -17,7 +17,7 @@ export const SiteFooter = () => (
         <ul className="space-y-2 text-sm text-background/70">
           <li><a href="/#solucao" className="hover:text-accent">Solução</a></li>
           <li><a href="/#beneficios" className="hover:text-accent">Benefícios</a></li>
-          <li><a href="/app" className="hover:text-accent">Sistema</a></li>
+          <li><a href="/confeccao" className="hover:text-accent">Sistema</a></li>
         </ul>
       </div>
       <div>

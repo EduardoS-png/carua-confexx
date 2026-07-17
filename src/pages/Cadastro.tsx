@@ -12,13 +12,13 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import heroImg from "@/assets/hero-textile.jpg";
 
-type Tipo = "faccao" | "profissional";
+type Tipo = "confeccao" | "faccao" | "profissional";
 
 const totalEtapas = 4;
 
 const Cadastro = () => {
   const [etapa, setEtapa] = useState(1);
-  const [tipo, setTipo] = useState<Tipo>("faccao");
+  const [tipo, setTipo] = useState<Tipo>("confeccao");
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -52,7 +52,7 @@ const Cadastro = () => {
       if (!cidade.trim()) return "Informe sua cidade";
     }
     if (etapa === 3) {
-      if (tipo === "faccao" && !nomeConfeccao.trim()) return "Nome da confecção é obrigatório";
+      if ((tipo === "confeccao" || tipo === "faccao") && !nomeConfeccao.trim()) return "Informe o nome da empresa";
       if (tipo === "profissional" && !especialidade.trim()) return "Informe sua especialidade";
     }
     if (etapa === 4) {
@@ -83,11 +83,13 @@ const Cadastro = () => {
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      toast({
-        title: "Conta criada! 🎉",
-        description: tipo === "faccao" ? "Bem-vindo(a) ao painel da sua confecção." : "Sua área profissional está pronta.",
-      });
-      navigate(tipo === "faccao" ? "/app" : "/pro");
+      const dest = tipo === "confeccao" ? "/confeccao" : tipo === "faccao" ? "/faccao" : "/pro";
+      const desc =
+        tipo === "confeccao" ? "Painel da sua confecção pronto para coordenar a cadeia." :
+        tipo === "faccao" ? "Sua área da facção está pronta para receber lotes." :
+        "Sua área profissional está pronta.";
+      toast({ title: "Conta criada! 🎉", description: desc });
+      navigate(dest);
     }, 900);
   };
 
@@ -109,9 +111,9 @@ const Cadastro = () => {
             <h1 className="font-display text-4xl font-extrabold leading-[1.1] text-white">
               {etapa === 1 && <>Comece sua jornada<br /><span className="text-orange-300">em 4 passos.</span></>}
               {etapa === 2 && <>Quem é você?<br /><span className="text-orange-300">Conte-nos.</span></>}
-              {etapa === 3 && (tipo === "faccao"
-                ? <>Sobre sua<br /><span className="text-orange-300">confecção.</span></>
-                : <>Seu trabalho,<br /><span className="text-orange-300">seu portfólio.</span></>)}
+              {etapa === 3 && (tipo === "profissional"
+                ? <>Seu trabalho,<br /><span className="text-orange-300">seu portfólio.</span></>
+                : <>Sobre sua<br /><span className="text-orange-300">{tipo === "confeccao" ? "confecção." : "facção."}</span></>)}
               {etapa === 4 && <>Quase lá!<br /><span className="text-orange-300">Proteja sua conta.</span></>}
             </h1>
             <p className="text-base leading-relaxed text-white/85">
@@ -126,7 +128,7 @@ const Cadastro = () => {
               {[
                 { n: 1, label: "Tipo de conta" },
                 { n: 2, label: "Dados pessoais" },
-                { n: 3, label: tipo === "faccao" ? "Sobre a confecção" : "Sobre seu trabalho" },
+                { n: 3, label: tipo === "profissional" ? "Sobre seu trabalho" : tipo === "confeccao" ? "Sobre a confecção" : "Sobre a facção" },
                 { n: 4, label: "Segurança" },
               ].map((s) => {
                 const concluida = etapa > s.n;
@@ -187,7 +189,8 @@ const Cadastro = () => {
                 </div>
                 <div className="grid gap-3">
                   {([
-                    { v: "faccao", icon: Building2, label: "Sou uma facção", sub: "Quero gerenciar produção, equipe e estoque", chips: ["Pedidos em lote", "Equipe", "Marketplace"] },
+                    { v: "confeccao", icon: Building2, label: "Sou uma confecção", sub: "Coordeno a produção e distribuo lotes para facções e serviços", chips: ["Ordens", "Lotes", "Parceiros"] },
+                    { v: "faccao", icon: Building2, label: "Sou uma facção / serviço", sub: "Executo etapas (costura, corte, bordado, lavagem, estampa)", chips: ["Lotes recebidos", "Andamento", "Histórico"] },
                     { v: "profissional", icon: UserCircle2, label: "Sou profissional autônomo", sub: "Quero divulgar meu trabalho e receber pedidos", chips: ["Portfólio", "Pedidos", "Agenda"] },
                   ] as const).map((opt) => {
                     const active = tipo === opt.v;
@@ -242,21 +245,29 @@ const Cadastro = () => {
               </div>
             )}
 
-            {/* Etapa 3 — profissional/confecção */}
-            {etapa === 3 && tipo === "faccao" && (
+            {/* Etapa 3 — confecção ou facção */}
+            {etapa === 3 && (tipo === "confeccao" || tipo === "faccao") && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="font-display text-[26px] font-bold tracking-tight">Sobre sua confecção</h2>
+                  <h2 className="font-display text-[26px] font-bold tracking-tight">
+                    Sobre sua {tipo === "confeccao" ? "confecção" : "facção"}
+                  </h2>
                   <p className="mt-1 text-sm text-muted-foreground">Esses dados aparecem no seu perfil.</p>
                 </div>
-                <FieldIcon label="Nome da confecção" icon={Building2} value={nomeConfeccao} onChange={setNomeConfeccao} placeholder="Confecção Sertão" />
+                <FieldIcon
+                  label={tipo === "confeccao" ? "Nome da confecção" : "Nome da facção"}
+                  icon={Building2}
+                  value={nomeConfeccao}
+                  onChange={setNomeConfeccao}
+                  placeholder={tipo === "confeccao" ? "Confecção Sertão" : "Facção Dona Maria"}
+                />
                 <div className="grid grid-cols-2 gap-3">
                   <FieldIcon label="CNPJ (opcional)" icon={Briefcase} value={cnpj} onChange={setCnpj} placeholder="00.000.000/0001-00" />
-                  <FieldIcon label="Tamanho da equipe" icon={Users} value={tamanhoEquipe} onChange={setTamanhoEquipe} placeholder="5 a 10" />
+                  <FieldIcon label={tipo === "confeccao" ? "Tamanho da equipe" : "Capacidade peças/mês"} icon={Users} value={tamanhoEquipe} onChange={setTamanhoEquipe} placeholder={tipo === "confeccao" ? "5 a 10" : "800"} />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Apresentação (opcional)</Label>
-                  <Textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="O que sua confecção faz de melhor?" />
+                  <Textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)} placeholder={tipo === "confeccao" ? "O que sua confecção faz de melhor?" : "Que serviços sua facção executa?"} />
                 </div>
               </div>
             )}

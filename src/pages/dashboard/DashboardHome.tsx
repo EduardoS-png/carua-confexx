@@ -94,7 +94,7 @@ const DashboardHome = () => {
                 </p>
               </div>
             </div>
-            <Button asChild variant="destructive" size="sm"><Link to="/app/alertas">Ver alertas <ArrowRight /></Link></Button>
+            <Button asChild variant="destructive" size="sm"><Link to="/confeccao/alertas">Ver alertas <ArrowRight /></Link></Button>
           </CardContent>
         </Card>
       )}
@@ -171,7 +171,7 @@ const DashboardHome = () => {
             <CardTitle className="font-display flex items-center gap-2 text-base">
               <UserCheck className="h-5 w-5 text-primary" /> Carga da equipe
             </CardTitle>
-            <Button asChild variant="ghost" size="sm"><Link to="/app/equipe">Gerenciar <ArrowRight /></Link></Button>
+            <Button asChild variant="ghost" size="sm"><Link to="/confeccao/equipe">Gerenciar <ArrowRight /></Link></Button>
           </CardHeader>
           <CardContent className="space-y-2">
             {cargaEquipe.map(c => (
@@ -210,15 +210,15 @@ const DashboardHome = () => {
                 ))}
               </ul>
             )}
-            <Button asChild variant="soft" className="mt-4 w-full"><Link to="/app/materiais">Gerenciar materiais</Link></Button>
+            <Button asChild variant="soft" className="mt-4 w-full"><Link to="/confeccao/materiais">Gerenciar materiais</Link></Button>
           </CardContent>
         </Card>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <QuickAction to="/app/pedidos" icon={ClipboardList} label="Novo pedido" />
-        <QuickAction to="/app/materiais" icon={Boxes} label="Registrar material" />
-        <QuickAction to="/app/equipe" icon={Users} label="Cadastrar membro" />
+        <QuickAction to="/confeccao/pedidos" icon={ClipboardList} label="Novo pedido" />
+        <QuickAction to="/confeccao/materiais" icon={Boxes} label="Registrar material" />
+        <QuickAction to="/confeccao/equipe" icon={Users} label="Cadastrar membro" />
       </div>
     </div>
   );

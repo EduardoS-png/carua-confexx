@@ -1,38 +1,28 @@
 import { Link, NavLink, Outlet, useLocation } from "react-router-dom";
 import {
-  SidebarProvider,
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarTrigger,
-  useSidebar,
+  SidebarProvider, Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent,
+  SidebarGroupLabel, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem,
+  SidebarTrigger, useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, ClipboardList, Boxes, Users, Wallet, ArrowLeft, Store, BarChart3, Bell, Handshake, PackageOpen } from "lucide-react";
+import { LayoutDashboard, PackageCheck, History, UserCircle2, ArrowLeft } from "lucide-react";
 import { Logo } from "@/components/site/Logo";
+import { Badge } from "@/components/ui/badge";
 import { UserMenu } from "@/components/dashboard/UserMenu";
+import { FACCAO_LOGADA_ID, lotes, parceiros } from "@/data/mock";
 
-const items = [
-  { to: "/confeccao", label: "Visão geral", icon: LayoutDashboard, end: true },
-  { to: "/confeccao/pedidos", label: "Ordens de produção", icon: ClipboardList },
-  { to: "/confeccao/lotes", label: "Lotes distribuídos", icon: PackageOpen },
-  { to: "/confeccao/parceiros", label: "Parceiros produtivos", icon: Handshake },
-  { to: "/confeccao/materiais", label: "Materiais", icon: Boxes },
-  { to: "/confeccao/equipe", label: "Equipe interna", icon: Users },
-  { to: "/confeccao/financeiro", label: "Financeiro", icon: Wallet },
-  { to: "/confeccao/relatorios", label: "Relatórios", icon: BarChart3 },
-  { to: "/confeccao/alertas", label: "Alertas e gargalos", icon: Bell },
-];
-
-const AppSidebar = () => {
+const FaccaoSidebar = () => {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { pathname } = useLocation();
+  const me = parceiros.find((p) => p.id === FACCAO_LOGADA_ID)!;
+  const lotesAtivos = lotes.filter((l) => l.parceiroId === me.id && l.status !== "entregue").length;
+
+  const items = [
+    { to: "/faccao", label: "Visão geral", icon: LayoutDashboard, end: true, badge: 0 },
+    { to: "/faccao/lotes", label: "Lotes recebidos", icon: PackageCheck, badge: lotesAtivos },
+    { to: "/faccao/historico", label: "Histórico", icon: History, badge: 0 },
+    { to: "/faccao/perfil", label: "Meu perfil", icon: UserCircle2, badge: 0 },
+  ];
 
   return (
     <Sidebar collapsible="icon">
@@ -42,14 +32,20 @@ const AppSidebar = () => {
           {!collapsed && (
             <div className="flex flex-col leading-tight">
               <span className="font-display text-sm font-bold text-sidebar-foreground">Caruá Confex</span>
-              <span className="text-[10px] uppercase tracking-wider text-accent">Confecção</span>
+              <span className="text-[10px] uppercase tracking-wider text-accent">Facção</span>
             </div>
           )}
         </Link>
+        {!collapsed && (
+          <div className="mx-2 mb-1 mt-2 rounded-xl bg-sidebar-accent/40 p-2.5">
+            <p className="truncate text-sm font-semibold text-sidebar-foreground">{me.nome}</p>
+            <p className="truncate text-[11px] text-sidebar-foreground/70">{me.cidade} · Cap. {me.capacidadeMes}/mês</p>
+          </div>
+        )}
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Coordenação da cadeia</SidebarGroupLabel>
+          <SidebarGroupLabel>Produção</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((it) => {
@@ -59,7 +55,14 @@ const AppSidebar = () => {
                     <SidebarMenuButton asChild isActive={active}>
                       <NavLink to={it.to} end={it.end} className="flex items-center gap-2">
                         <it.icon className="h-4 w-4" />
-                        {!collapsed && <span>{it.label}</span>}
+                        {!collapsed && (
+                          <span className="flex flex-1 items-center justify-between">
+                            {it.label}
+                            {it.badge > 0 && (
+                              <Badge className="ml-2 h-5 bg-accent px-1.5 text-[10px] text-accent-foreground hover:bg-accent">{it.badge}</Badge>
+                            )}
+                          </span>
+                        )}
                       </NavLink>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
@@ -70,17 +73,8 @@ const AppSidebar = () => {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel>Comunidade</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              <SidebarMenuItem>
-                <SidebarMenuButton asChild>
-                  <NavLink to="/marketplace" className="flex items-center gap-2">
-                    <Store className="h-4 w-4" />
-                    {!collapsed && <span>Marketplace</span>}
-                  </NavLink>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
                   <NavLink to="/" className="flex items-center gap-2">
@@ -97,17 +91,18 @@ const AppSidebar = () => {
   );
 };
 
-const DashboardLayout = () => {
+const FaccaoLayout = () => {
+  const me = parceiros.find((p) => p.id === FACCAO_LOGADA_ID)!;
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full bg-background">
-        <AppSidebar />
+        <FaccaoSidebar />
         <div className="flex flex-1 flex-col">
           <header className="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
             <SidebarTrigger />
             <div className="ml-auto flex items-center gap-3">
-              <span className="hidden text-sm text-muted-foreground sm:inline">Olá, Dona Maria 👋</span>
-              <UserMenu nome="Dona Maria" papel="Confecção Sertão · Caruaru" perfilHref="/confeccao/perfil" iniciais="M" />
+              <span className="hidden text-sm text-muted-foreground sm:inline">Olá, {me.responsavel.split(" ")[0]} 👋</span>
+              <UserMenu nome={me.responsavel} papel={`${me.nome} · ${me.cidade}`} perfilHref="/faccao/perfil" iniciais={me.responsavel.split(" ").map((n) => n[0]).slice(0, 2).join("")} />
             </div>
           </header>
           <main className="flex-1 p-4 md:p-8">
@@ -119,4 +114,4 @@ const DashboardLayout = () => {
   );
 };
 
-export default DashboardLayout;
+export default FaccaoLayout;
