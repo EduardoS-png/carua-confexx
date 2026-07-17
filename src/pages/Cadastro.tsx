@@ -12,7 +12,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import heroImg from "@/assets/hero-textile.jpg";
 
-type Tipo = "faccao" | "profissional";
+type Tipo = "confeccao" | "faccao" | "profissional";
 
 const totalEtapas = 4;
 
