@@ -52,7 +52,7 @@ const Cadastro = () => {
       if (!cidade.trim()) return "Informe sua cidade";
     }
     if (etapa === 3) {
-      if (tipo === "faccao" && !nomeConfeccao.trim()) return "Nome da confecção é obrigatório";
+      if ((tipo === "confeccao" || tipo === "faccao") && !nomeConfeccao.trim()) return "Informe o nome da empresa";
       if (tipo === "profissional" && !especialidade.trim()) return "Informe sua especialidade";
     }
     if (etapa === 4) {
