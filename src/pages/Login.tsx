@@ -115,12 +115,30 @@ const Login = () => {
         <div className="flex flex-1 items-center justify-center px-6 pb-12">
           <div className="w-full max-w-[380px] space-y-8">
             <div className="space-y-2">
-              <h2 className="font-display text-[28px] font-bold tracking-tight text-foreground">
-                Entrar
-              </h2>
-              <p className="text-[15px] text-muted-foreground">
-                Acesse o painel da sua confecção
-              </p>
+              <h2 className="font-display text-[28px] font-bold tracking-tight text-foreground">Entrar</h2>
+              <p className="text-[15px] text-muted-foreground">Escolha seu perfil e acesse.</p>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2">
+              {([
+                { v: "confeccao", label: "Confecção" },
+                { v: "faccao", label: "Facção" },
+                { v: "pro", label: "Profissional" },
+              ] as const).map((o) => {
+                const active = perfil === o.v;
+                return (
+                  <button
+                    key={o.v}
+                    type="button"
+                    onClick={() => setPerfil(o.v)}
+                    className={`rounded-xl border px-2 py-2.5 text-xs font-semibold transition-all ${
+                      active ? "border-primary bg-primary/5 text-primary" : "border-border bg-surface/30 text-muted-foreground hover:border-primary/40"
+                    }`}
+                  >
+                    {o.label}
+                  </button>
+                );
+              })}
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
