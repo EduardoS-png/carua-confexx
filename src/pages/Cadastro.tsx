@@ -245,21 +245,29 @@ const Cadastro = () => {
               </div>
             )}
 
-            {/* Etapa 3 — profissional/confecção */}
-            {etapa === 3 && tipo === "faccao" && (
+            {/* Etapa 3 — confecção ou facção */}
+            {etapa === 3 && (tipo === "confeccao" || tipo === "faccao") && (
               <div className="space-y-5">
                 <div>
-                  <h2 className="font-display text-[26px] font-bold tracking-tight">Sobre sua confecção</h2>
+                  <h2 className="font-display text-[26px] font-bold tracking-tight">
+                    Sobre sua {tipo === "confeccao" ? "confecção" : "facção"}
+                  </h2>
                   <p className="mt-1 text-sm text-muted-foreground">Esses dados aparecem no seu perfil.</p>
                 </div>
-                <FieldIcon label="Nome da confecção" icon={Building2} value={nomeConfeccao} onChange={setNomeConfeccao} placeholder="Confecção Sertão" />
+                <FieldIcon
+                  label={tipo === "confeccao" ? "Nome da confecção" : "Nome da facção"}
+                  icon={Building2}
+                  value={nomeConfeccao}
+                  onChange={setNomeConfeccao}
+                  placeholder={tipo === "confeccao" ? "Confecção Sertão" : "Facção Dona Maria"}
+                />
                 <div className="grid grid-cols-2 gap-3">
                   <FieldIcon label="CNPJ (opcional)" icon={Briefcase} value={cnpj} onChange={setCnpj} placeholder="00.000.000/0001-00" />
-                  <FieldIcon label="Tamanho da equipe" icon={Users} value={tamanhoEquipe} onChange={setTamanhoEquipe} placeholder="5 a 10" />
+                  <FieldIcon label={tipo === "confeccao" ? "Tamanho da equipe" : "Capacidade peças/mês"} icon={Users} value={tamanhoEquipe} onChange={setTamanhoEquipe} placeholder={tipo === "confeccao" ? "5 a 10" : "800"} />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Apresentação (opcional)</Label>
-                  <Textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="O que sua confecção faz de melhor?" />
+                  <Textarea rows={3} value={bio} onChange={(e) => setBio(e.target.value)} placeholder={tipo === "confeccao" ? "O que sua confecção faz de melhor?" : "Que serviços sua facção executa?"} />
                 </div>
               </div>
             )}
