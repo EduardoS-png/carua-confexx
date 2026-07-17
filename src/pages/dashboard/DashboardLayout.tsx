@@ -49,7 +49,7 @@ const AppSidebar = () => {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Gestão</SidebarGroupLabel>
+          <SidebarGroupLabel>Coordenação da cadeia</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((it) => {
