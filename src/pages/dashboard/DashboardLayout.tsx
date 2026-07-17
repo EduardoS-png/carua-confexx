@@ -40,9 +40,10 @@ const AppSidebar = () => {
         <Link to="/" className="flex items-center gap-2 px-2 py-2">
           <Logo className="h-7 w-7 shrink-0" inverted />
           {!collapsed && (
-            <span className="font-display text-base font-bold text-sidebar-foreground">
-              Caruá Confex
-            </span>
+            <div className="flex flex-col leading-tight">
+              <span className="font-display text-sm font-bold text-sidebar-foreground">Caruá Confex</span>
+              <span className="text-[10px] uppercase tracking-wider text-accent">Confecção</span>
+            </div>
           )}
         </Link>
       </SidebarHeader>
