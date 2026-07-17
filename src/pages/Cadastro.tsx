@@ -18,7 +18,7 @@ const totalEtapas = 4;
 
 const Cadastro = () => {
   const [etapa, setEtapa] = useState(1);
-  const [tipo, setTipo] = useState<Tipo>("faccao");
+  const [tipo, setTipo] = useState<Tipo>("confeccao");
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
