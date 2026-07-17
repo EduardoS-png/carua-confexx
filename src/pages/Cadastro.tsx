@@ -128,7 +128,7 @@ const Cadastro = () => {
               {[
                 { n: 1, label: "Tipo de conta" },
                 { n: 2, label: "Dados pessoais" },
-                { n: 3, label: tipo === "faccao" ? "Sobre a confecção" : "Sobre seu trabalho" },
+                { n: 3, label: tipo === "profissional" ? "Sobre seu trabalho" : tipo === "confeccao" ? "Sobre a confecção" : "Sobre a facção" },
                 { n: 4, label: "Segurança" },
               ].map((s) => {
                 const concluida = etapa > s.n;
