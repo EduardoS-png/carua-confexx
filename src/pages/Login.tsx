@@ -8,9 +8,12 @@ import { Eye, EyeOff, ArrowRight, Sparkles, Shield, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import heroImg from "@/assets/hero-textile.jpg";
 
+type Perfil = "confeccao" | "faccao" | "pro";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [perfil, setPerfil] = useState<Perfil>("confeccao");
   const [showSenha, setShowSenha] = useState(false);
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
@@ -24,7 +27,7 @@ const Login = () => {
       setLoading(false);
       if (email && senha) {
         toast({ title: "Bem-vindo(a) de volta!", description: "Login realizado com sucesso." });
-        navigate("/confeccao");
+        navigate(perfil === "confeccao" ? "/confeccao" : perfil === "faccao" ? "/faccao" : "/pro");
       } else {
         toast({ title: "Erro", description: "Preencha todos os campos.", variant: "destructive" });
       }
