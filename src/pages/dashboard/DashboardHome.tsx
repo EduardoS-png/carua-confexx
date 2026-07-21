@@ -156,30 +156,40 @@ const DashboardHome = () => {
         </Card>
       </div>
 
-      {/* Carga da equipe + Estoque */}
+      {/* Carga por parceiro produtivo + Estoque */}
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2 shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="font-display flex items-center gap-2 text-base">
-              <UserCheck className="h-5 w-5 text-primary" /> Carga da equipe
+              <Handshake className="h-5 w-5 text-primary" /> Carga dos parceiros produtivos
             </CardTitle>
-            <Button asChild variant="ghost" size="sm"><Link to="/confeccao/equipe">Gerenciar <ArrowRight /></Link></Button>
+            <Button asChild variant="ghost" size="sm"><Link to="/confeccao/parceiros">Gerenciar <ArrowRight /></Link></Button>
           </CardHeader>
           <CardContent className="space-y-2">
-            {cargaEquipe.map(c => (
-              <div key={c.nome} className="flex items-center gap-3 rounded-lg border border-border p-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-warm font-display text-sm font-bold text-primary-foreground">
-                  {c.nome[0]}
+            {cargaParceiros.length === 0 && <p className="text-sm text-muted-foreground">Nenhum parceiro ativo.</p>}
+            {cargaParceiros.map(p => {
+              const ocup = Math.min(100, Math.round((p.pecas / Math.max(p.capacidadeMes, 1)) * 100));
+              return (
+                <div key={p.id} className="rounded-lg border border-border p-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-warm font-display text-sm font-bold text-primary-foreground">
+                      {p.nome[0]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">{p.nome}</p>
+                      <p className="text-xs text-muted-foreground truncate">{tipoParceiroLabel[p.tipo]} · {p.cidade}</p>
+                    </div>
+                    <Badge variant={p.lotesAtivos >= 2 ? "destructive" : p.lotesAtivos === 1 ? "secondary" : "outline"} className="shrink-0">
+                      {p.lotesAtivos} {p.lotesAtivos === 1 ? "lote" : "lotes"}
+                    </Badge>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Progress value={ocup} className="h-1.5 flex-1" />
+                    <span className="w-14 text-right text-[11px] text-muted-foreground">{p.pecas}/{p.capacidadeMes}</span>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{c.nome}</p>
-                  <p className="text-xs text-muted-foreground truncate">{c.funcao}</p>
-                </div>
-                <Badge variant={c.tarefas >= 2 ? "destructive" : c.tarefas === 1 ? "secondary" : "outline"} className="shrink-0">
-                  {c.tarefas} {c.tarefas === 1 ? "tarefa" : "tarefas"}
-                </Badge>
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
 
@@ -208,9 +218,9 @@ const DashboardHome = () => {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <QuickAction to="/confeccao/pedidos" icon={ClipboardList} label="Novo pedido" />
-        <QuickAction to="/confeccao/materiais" icon={Boxes} label="Registrar material" />
-        <QuickAction to="/confeccao/equipe" icon={Users} label="Cadastrar membro" />
+        <QuickAction to="/confeccao/pedidos" icon={ClipboardList} label="Nova ordem de produção" />
+        <QuickAction to="/confeccao/lotes" icon={Truck} label="Distribuir lotes" />
+        <QuickAction to="/confeccao/parceiros" icon={Handshake} label="Cadastrar parceiro" />
       </div>
     </div>
   );
