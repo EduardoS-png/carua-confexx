@@ -91,13 +91,14 @@ export interface Material {
   unidade: string;
   estoque: number;
   minimo: number;
+  reservado?: number; // comprometido com lotes em produção
   ultimaEntrada: string;
-  vinculadoA?: string; // pedido id
+  vinculadoA?: string; // pedido id (legado)
 }
 
-export type TipoMovimento = "entrada" | "saida";
+export type TipoMovimento = "entrada" | "saida" | "reserva" | "liberar_reserva";
 
-export type VinculoTipo = "pedido" | "membro" | "nenhum";
+export type VinculoTipo = "lote" | "parceiro" | "profissional" | "pedido" | "membro" | "nenhum";
 
 export interface MovimentoMaterial {
   id: string;
@@ -105,8 +106,11 @@ export interface MovimentoMaterial {
   tipo: TipoMovimento;
   quantidade: number;
   observacao?: string;
-  pedidoId?: string;
-  membroId?: string; // se o material foi entregue / devolvido por um membro da equipe
+  pedidoId?: string;       // ordem de produção
+  loteId?: string;         // lote distribuído
+  parceiroId?: string;     // facção / serviço
+  profissionalId?: string; // profissional autônomo
+  membroId?: string;       // legado
   data: string;
 }
 
