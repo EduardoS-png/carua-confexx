@@ -4,16 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
-  ArrowRight, ClipboardList, Boxes, Wallet, Users, AlertTriangle, TrendingUp,
-  Target, CheckCircle2, Bell, Calendar, UserCheck, Truck,
+  ArrowRight, ClipboardList, Boxes, Wallet, AlertTriangle, TrendingUp,
+  Target, CheckCircle2, Bell, Calendar, Truck, Handshake,
 } from "lucide-react";
-import { pedidos, materiais, equipe } from "@/data/mock";
+import { pedidos, materiais, parceiros, lotes, tipoParceiroLabel } from "@/data/mock";
 import { PageHeader } from "@/components/dashboard/PageHeader";
-import type { EtapaProducao } from "@/data/mock";
-
-const etapaLabel: Record<EtapaProducao, string> = {
-  corte: "Corte", costura: "Costura", acabamento: "Acabamento", entrega: "Entrega",
-};
 
 const DashboardHome = () => {
   const hoje = new Date();
@@ -40,24 +35,21 @@ const DashboardHome = () => {
     { label: "Entregas no prazo", atual: taxaPrazo, meta: 100, sufixo: "%" },
   ];
 
-  // Próximas entregas (top 5 prazos)
+  // Próximas entregas
   const proximasEntregas = [...ativos].sort((a, b) => new Date(a.prazo).getTime() - new Date(b.prazo).getTime()).slice(0, 5);
 
-  // Carga por membro (pedidos ativos onde aparece como responsável em qualquer etapa ainda não concluída)
-  const cargaEquipe = equipe.filter(m => m.ativo).map(m => {
-    const tarefas = ativos.filter(p =>
-      Object.entries(p.responsaveisPorEtapa).some(([et, nome]) =>
-        nome === m.nome && p.etapas[et as EtapaProducao] !== "concluido"
-      )
-    ).length;
-    return { nome: m.nome, funcao: m.funcao, tarefas };
-  }).sort((a, b) => b.tarefas - a.tarefas);
+  // Carga por parceiro produtivo (lotes ativos)
+  const cargaParceiros = parceiros.filter(p => p.ativo).map(p => {
+    const lotesAtivos = lotes.filter(l => l.parceiroId === p.id && l.status !== "entregue");
+    const pecas = lotesAtivos.reduce((s, l) => s + l.quantidade, 0);
+    return { ...p, lotesAtivos: lotesAtivos.length, pecas };
+  }).sort((a, b) => b.lotesAtivos - a.lotesAtivos).slice(0, 6);
 
   const stats = [
     { label: "Pedidos ativos", value: ativos.length, icon: ClipboardList, color: "text-primary", bg: "bg-primary/10" },
     { label: "Peças no mês", value: pecasMes, icon: TrendingUp, color: "text-accent", bg: "bg-accent/10" },
     { label: "Receita prevista", value: `R$ ${receita.toLocaleString("pt-BR")}`, icon: Wallet, color: "text-green-700", bg: "bg-green-100" },
-    { label: "Equipe ativa", value: equipe.filter(m => m.ativo).length, icon: Users, color: "text-foreground", bg: "bg-muted" },
+    { label: "Parceiros ativos", value: parceiros.filter(p => p.ativo).length, icon: Handshake, color: "text-foreground", bg: "bg-muted" },
   ];
 
   return (
