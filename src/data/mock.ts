@@ -647,6 +647,9 @@ export const lotes: Lote[] = [
       { data: "2026-04-26", texto: "Iniciada produção (30%).", autor: "Maria Souza" },
       { data: "2026-04-29", texto: "60% concluído.", autor: "Maria Souza" },
     ],
+    subcontratados: [
+      { profissionalId: "p3", papel: "Reforço no acabamento — 40 peças", pecas: 40, status: "confirmado" },
+    ],
   },
   {
     id: "LOTE-502",
