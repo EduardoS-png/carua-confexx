@@ -69,7 +69,10 @@ const FaccaoLotes = () => {
                       <Badge variant="outline" className="text-[10px] uppercase">{l.etapa}</Badge>
                     </div>
                     <p className="mt-0.5 text-xs text-muted-foreground">
-                      Lote {l.id} · {l.quantidade} peças · R$ {l.valorPeca.toFixed(2)}/peça · Ordem {l.ordemId}
+                      Lote {l.id} · {l.quantidade} peças · R$ {l.valorPeca.toFixed(2)}/peça
+                    </p>
+                    <p className="mt-0.5 text-[11px] text-muted-foreground">
+                      De <span className="font-semibold text-primary">{l.confeccaoNome}</span> · Ordem {l.ordemId}
                     </p>
                     <div className="mt-2 flex items-center gap-3">
                       <Progress value={l.avancoPct} className="h-1.5 flex-1" />
