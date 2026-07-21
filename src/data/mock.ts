@@ -272,12 +272,12 @@ export const pedidos: Pedido[] = [
 ];
 
 export const materiais: Material[] = [
-  { id: "M1", nome: "Tecido algodão branco", unidade: "m", estoque: 240, minimo: 50, ultimaEntrada: "2026-04-20", vinculadoA: "LT-2401" },
-  { id: "M2", nome: "Linha branca 5000m", unidade: "un", estoque: 8, minimo: 5, ultimaEntrada: "2026-04-15" },
-  { id: "M3", nome: "Tecido floral", unidade: "m", estoque: 12, minimo: 30, ultimaEntrada: "2026-04-10", vinculadoA: "LT-2402" },
-  { id: "M4", nome: "Botão madrepérola", unidade: "un", estoque: 1200, minimo: 200, ultimaEntrada: "2026-04-22" },
-  { id: "M5", nome: "Zíper 20cm", unidade: "un", estoque: 35, minimo: 50, ultimaEntrada: "2026-04-12" },
-  { id: "M6", nome: "Renda guipir", unidade: "m", estoque: 18, minimo: 10, ultimaEntrada: "2026-04-25" },
+  { id: "M1", nome: "Tecido algodão branco", unidade: "m", estoque: 240, minimo: 50, reservado: 60, ultimaEntrada: "2026-04-20", vinculadoA: "LT-2401" },
+  { id: "M2", nome: "Linha branca 5000m", unidade: "un", estoque: 8, minimo: 5, reservado: 0, ultimaEntrada: "2026-04-15" },
+  { id: "M3", nome: "Tecido floral", unidade: "m", estoque: 12, minimo: 30, reservado: 8, ultimaEntrada: "2026-04-10", vinculadoA: "LT-2402" },
+  { id: "M4", nome: "Botão madrepérola", unidade: "un", estoque: 1200, minimo: 200, reservado: 400, ultimaEntrada: "2026-04-22" },
+  { id: "M5", nome: "Zíper 20cm", unidade: "un", estoque: 35, minimo: 50, reservado: 0, ultimaEntrada: "2026-04-12" },
+  { id: "M6", nome: "Renda guipir", unidade: "m", estoque: 18, minimo: 10, reservado: 6, ultimaEntrada: "2026-04-25" },
 ];
 
 export const movimentosIniciais: MovimentoMaterial[] = [
