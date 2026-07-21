@@ -59,7 +59,7 @@ const Alertas = () => {
   gargalos.forEach(g => alertas.push({
     tipo: "info", icon: Flame, titulo: `Gargalo no ${etapaLabel[g.etapa]}`,
     msg: `${g.pedidos} pedidos para ${g.membros} membro(s) ativo(s)`,
-    link: "/confeccao/equipe",
+    link: "/confeccao/parceiros",
   }));
 
   const cores = {
