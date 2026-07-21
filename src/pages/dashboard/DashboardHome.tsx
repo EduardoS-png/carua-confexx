@@ -4,16 +4,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
-  ArrowRight, ClipboardList, Boxes, Wallet, Users, AlertTriangle, TrendingUp,
-  Target, CheckCircle2, Bell, Calendar, UserCheck, Truck,
+  ArrowRight, ClipboardList, Boxes, Wallet, AlertTriangle, TrendingUp,
+  Target, CheckCircle2, Bell, Calendar, Truck, Handshake,
 } from "lucide-react";
-import { pedidos, materiais, equipe } from "@/data/mock";
+import { pedidos, materiais, parceiros, lotes, tipoParceiroLabel } from "@/data/mock";
 import { PageHeader } from "@/components/dashboard/PageHeader";
-import type { EtapaProducao } from "@/data/mock";
-
-const etapaLabel: Record<EtapaProducao, string> = {
-  corte: "Corte", costura: "Costura", acabamento: "Acabamento", entrega: "Entrega",
-};
 
 const DashboardHome = () => {
   const hoje = new Date();
@@ -40,24 +35,21 @@ const DashboardHome = () => {
     { label: "Entregas no prazo", atual: taxaPrazo, meta: 100, sufixo: "%" },
   ];
 
-  // Próximas entregas (top 5 prazos)
+  // Próximas entregas
   const proximasEntregas = [...ativos].sort((a, b) => new Date(a.prazo).getTime() - new Date(b.prazo).getTime()).slice(0, 5);
 
-  // Carga por membro (pedidos ativos onde aparece como responsável em qualquer etapa ainda não concluída)
-  const cargaEquipe = equipe.filter(m => m.ativo).map(m => {
-    const tarefas = ativos.filter(p =>
-      Object.entries(p.responsaveisPorEtapa).some(([et, nome]) =>
-        nome === m.nome && p.etapas[et as EtapaProducao] !== "concluido"
-      )
-    ).length;
-    return { nome: m.nome, funcao: m.funcao, tarefas };
-  }).sort((a, b) => b.tarefas - a.tarefas);
+  // Carga por parceiro produtivo (lotes ativos)
+  const cargaParceiros = parceiros.filter(p => p.ativo).map(p => {
+    const lotesAtivos = lotes.filter(l => l.parceiroId === p.id && l.status !== "entregue");
+    const pecas = lotesAtivos.reduce((s, l) => s + l.quantidade, 0);
+    return { ...p, lotesAtivos: lotesAtivos.length, pecas };
+  }).sort((a, b) => b.lotesAtivos - a.lotesAtivos).slice(0, 6);
 
   const stats = [
     { label: "Pedidos ativos", value: ativos.length, icon: ClipboardList, color: "text-primary", bg: "bg-primary/10" },
     { label: "Peças no mês", value: pecasMes, icon: TrendingUp, color: "text-accent", bg: "bg-accent/10" },
     { label: "Receita prevista", value: `R$ ${receita.toLocaleString("pt-BR")}`, icon: Wallet, color: "text-green-700", bg: "bg-green-100" },
-    { label: "Equipe ativa", value: equipe.filter(m => m.ativo).length, icon: Users, color: "text-foreground", bg: "bg-muted" },
+    { label: "Parceiros ativos", value: parceiros.filter(p => p.ativo).length, icon: Handshake, color: "text-foreground", bg: "bg-muted" },
   ];
 
   return (
@@ -164,30 +156,40 @@ const DashboardHome = () => {
         </Card>
       </div>
 
-      {/* Carga da equipe + Estoque */}
+      {/* Carga por parceiro produtivo + Estoque */}
       <div className="grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2 shadow-soft">
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle className="font-display flex items-center gap-2 text-base">
-              <UserCheck className="h-5 w-5 text-primary" /> Carga da equipe
+              <Handshake className="h-5 w-5 text-primary" /> Carga dos parceiros produtivos
             </CardTitle>
-            <Button asChild variant="ghost" size="sm"><Link to="/confeccao/equipe">Gerenciar <ArrowRight /></Link></Button>
+            <Button asChild variant="ghost" size="sm"><Link to="/confeccao/parceiros">Gerenciar <ArrowRight /></Link></Button>
           </CardHeader>
           <CardContent className="space-y-2">
-            {cargaEquipe.map(c => (
-              <div key={c.nome} className="flex items-center gap-3 rounded-lg border border-border p-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-warm font-display text-sm font-bold text-primary-foreground">
-                  {c.nome[0]}
+            {cargaParceiros.length === 0 && <p className="text-sm text-muted-foreground">Nenhum parceiro ativo.</p>}
+            {cargaParceiros.map(p => {
+              const ocup = Math.min(100, Math.round((p.pecas / Math.max(p.capacidadeMes, 1)) * 100));
+              return (
+                <div key={p.id} className="rounded-lg border border-border p-3">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-warm font-display text-sm font-bold text-primary-foreground">
+                      {p.nome[0]}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">{p.nome}</p>
+                      <p className="text-xs text-muted-foreground truncate">{tipoParceiroLabel[p.tipo]} · {p.cidade}</p>
+                    </div>
+                    <Badge variant={p.lotesAtivos >= 2 ? "destructive" : p.lotesAtivos === 1 ? "secondary" : "outline"} className="shrink-0">
+                      {p.lotesAtivos} {p.lotesAtivos === 1 ? "lote" : "lotes"}
+                    </Badge>
+                  </div>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Progress value={ocup} className="h-1.5 flex-1" />
+                    <span className="w-14 text-right text-[11px] text-muted-foreground">{p.pecas}/{p.capacidadeMes}</span>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{c.nome}</p>
-                  <p className="text-xs text-muted-foreground truncate">{c.funcao}</p>
-                </div>
-                <Badge variant={c.tarefas >= 2 ? "destructive" : c.tarefas === 1 ? "secondary" : "outline"} className="shrink-0">
-                  {c.tarefas} {c.tarefas === 1 ? "tarefa" : "tarefas"}
-                </Badge>
-              </div>
-            ))}
+              );
+            })}
           </CardContent>
         </Card>
 
@@ -216,9 +218,9 @@ const DashboardHome = () => {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <QuickAction to="/confeccao/pedidos" icon={ClipboardList} label="Novo pedido" />
-        <QuickAction to="/confeccao/materiais" icon={Boxes} label="Registrar material" />
-        <QuickAction to="/confeccao/equipe" icon={Users} label="Cadastrar membro" />
+        <QuickAction to="/confeccao/pedidos" icon={ClipboardList} label="Nova ordem de produção" />
+        <QuickAction to="/confeccao/lotes" icon={Truck} label="Distribuir lotes" />
+        <QuickAction to="/confeccao/parceiros" icon={Handshake} label="Cadastrar parceiro" />
       </div>
     </div>
   );

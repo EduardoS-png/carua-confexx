@@ -8,12 +8,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
-import { Plus, ArrowDown, ArrowUp, History, Search, Package, AlertTriangle, Boxes, User, ClipboardList } from "lucide-react";
+import {
+  Plus, ArrowDown, ArrowUp, History, Search, Package, AlertTriangle, Boxes,
+  ClipboardList, Factory, UserRound, Bookmark, BookmarkX,
+} from "lucide-react";
 import {
   materiais as initialMateriais,
   movimentosIniciais,
   pedidos,
-  equipe,
+  lotes,
+  parceiros,
+  profissionais,
+  tipoParceiroLabel,
   type Material,
   type MovimentoMaterial,
   type TipoMovimento,
@@ -21,7 +27,14 @@ import {
 import { PageHeader } from "@/components/dashboard/PageHeader";
 import { toast } from "sonner";
 
-type VinculoTab = "nenhum" | "pedido" | "membro";
+type VinculoTab = "nenhum" | "lote" | "parceiro" | "profissional";
+
+const tipoLabel: Record<TipoMovimento, string> = {
+  entrada: "Entrada",
+  saida: "Consumo",
+  reserva: "Reserva",
+  liberar_reserva: "Liberar reserva",
+};
 
 const Materiais = () => {
   const [lista, setLista] = useState<Material[]>(initialMateriais);
@@ -36,18 +49,21 @@ const Materiais = () => {
   const [movForm, setMovForm] = useState({
     quantidade: "",
     observacao: "",
-    pedidoId: "",
-    membroId: "",
+    loteId: "",
+    parceiroId: "",
+    profissionalId: "",
     vinculo: "nenhum" as VinculoTab,
   });
 
+  const disponivel = (m: Material) => +(m.estoque - (m.reservado ?? 0)).toFixed(2);
   const movsDe = (id: string) => movs.filter((m) => m.materialId === id).sort((a, b) => b.data.localeCompare(a.data));
 
   const stats = useMemo(() => {
-    const baixo = lista.filter((m) => m.estoque < m.minimo).length;
+    const baixo = lista.filter((m) => disponivel(m) < m.minimo).length;
     const total = lista.length;
     const movsHoje = movs.filter((m) => m.data === new Date().toISOString().slice(0, 10)).length;
-    return { total, baixo, movsHoje };
+    const reservadoTotal = lista.reduce((s, m) => s + (m.reservado ?? 0), 0);
+    return { total, baixo, movsHoje, reservadoTotal };
   }, [lista, movs]);
 
   const filtrada = useMemo(() => {
@@ -55,8 +71,8 @@ const Materiais = () => {
       const okBusca = !busca || m.nome.toLowerCase().includes(busca.toLowerCase());
       const okFiltro =
         filtro === "todos" ||
-        (filtro === "baixo" && m.estoque < m.minimo) ||
-        (filtro === "ok" && m.estoque >= m.minimo);
+        (filtro === "baixo" && disponivel(m) < m.minimo) ||
+        (filtro === "ok" && disponivel(m) >= m.minimo);
       return okBusca && okFiltro;
     });
   }, [lista, busca, filtro]);
@@ -66,18 +82,32 @@ const Materiais = () => {
     const qtd = Number(movForm.quantidade.replace(",", "."));
     if (!qtd || qtd <= 0) return toast.error("Informe uma quantidade válida");
     const { material, tipo } = openMov;
-    const delta = tipo === "entrada" ? qtd : -qtd;
-    if (tipo === "saida" && material.estoque < qtd) return toast.error("Estoque insuficiente");
+
+    const disp = disponivel(material);
+    if (tipo === "saida" && disp < qtd) return toast.error(`Saldo disponível insuficiente (${disp} ${material.unidade})`);
+    if (tipo === "reserva" && disp < qtd) return toast.error(`Sem saldo disponível para reservar`);
+    if (tipo === "liberar_reserva" && (material.reservado ?? 0) < qtd) return toast.error("Reserva insuficiente");
 
     setLista((prev) =>
-      prev.map((m) =>
-        m.id === material.id
-          ? { ...m, estoque: +(m.estoque + delta).toFixed(2), ultimaEntrada: new Date().toISOString().slice(0, 10) }
-          : m,
-      ),
+      prev.map((m) => {
+        if (m.id !== material.id) return m;
+        const reservadoAtual = m.reservado ?? 0;
+        if (tipo === "entrada")
+          return { ...m, estoque: +(m.estoque + qtd).toFixed(2), ultimaEntrada: new Date().toISOString().slice(0, 10) };
+        if (tipo === "saida")
+          return { ...m, estoque: +(m.estoque - qtd).toFixed(2) };
+        if (tipo === "reserva")
+          return { ...m, reservado: +(reservadoAtual + qtd).toFixed(2) };
+        if (tipo === "liberar_reserva")
+          return { ...m, reservado: +(reservadoAtual - qtd).toFixed(2) };
+        return m;
+      }),
     );
-    const pedidoId = movForm.vinculo === "pedido" ? movForm.pedidoId || undefined : undefined;
-    const membroId = movForm.vinculo === "membro" ? movForm.membroId || undefined : undefined;
+
+    const loteId = movForm.vinculo === "lote" ? movForm.loteId || undefined : undefined;
+    const parceiroId = movForm.vinculo === "parceiro" ? movForm.parceiroId || undefined : undefined;
+    const profissionalId = movForm.vinculo === "profissional" ? movForm.profissionalId || undefined : undefined;
+    const loteObj = loteId ? lotes.find((l) => l.id === loteId) : undefined;
 
     setMovs((prev) => [
       {
@@ -86,14 +116,17 @@ const Materiais = () => {
         tipo,
         quantidade: qtd,
         observacao: movForm.observacao || undefined,
-        pedidoId,
-        membroId,
+        loteId,
+        parceiroId: parceiroId ?? loteObj?.parceiroId,
+        profissionalId,
+        pedidoId: loteObj?.ordemId,
         data: new Date().toISOString().slice(0, 10),
       },
       ...prev,
     ]);
-    toast.success(`${tipo === "entrada" ? "Entrada" : "Saída"} de ${qtd} ${material.unidade} registrada`);
-    setMovForm({ quantidade: "", observacao: "", pedidoId: "", membroId: "", vinculo: "nenhum" });
+
+    toast.success(`${tipoLabel[tipo]} de ${qtd} ${material.unidade} registrado`);
+    setMovForm({ quantidade: "", observacao: "", loteId: "", parceiroId: "", profissionalId: "", vinculo: "nenhum" });
     setOpenMov(null);
   };
 
@@ -105,6 +138,7 @@ const Materiais = () => {
       unidade: form.unidade,
       estoque: Number(form.estoque) || 0,
       minimo: Number(form.minimo) || 0,
+      reservado: 0,
       ultimaEntrada: new Date().toISOString().slice(0, 10),
     };
     setLista([novo, ...lista]);
@@ -114,14 +148,27 @@ const Materiais = () => {
   };
 
   const histMaterial = useMemo(() => (openHist ? lista.find((m) => m.id === openHist) : null), [openHist, lista]);
-  const nomePedido = (id?: string) => pedidos.find((p) => p.id === id)?.produto;
-  const nomeMembro = (id?: string) => equipe.find((m) => m.id === id)?.nome;
+  const nomeLote = (id?: string) => {
+    const l = lotes.find((x) => x.id === id);
+    return l ? `${l.id} · ${l.produto}` : undefined;
+  };
+  const nomeParceiro = (id?: string) => parceiros.find((p) => p.id === id)?.nome;
+  const nomeProfissional = (id?: string) => profissionais.find((p) => p.id === id)?.nome;
+
+  const lotesAtivos = lotes.filter((l) => l.status !== "entregue");
+  const parceirosAtivos = parceiros.filter((p) => p.ativo);
+
+  const acoesTipos: { tipo: TipoMovimento; label: string; icon: any; className: string }[] = [
+    { tipo: "entrada", label: "Entrada", icon: ArrowDown, className: "text-success" },
+    { tipo: "saida", label: "Consumo", icon: ArrowUp, className: "text-destructive" },
+    { tipo: "reserva", label: "Reservar", icon: Bookmark, className: "text-accent" },
+  ];
 
   return (
     <div className="space-y-8">
       <PageHeader
         title="Materiais"
-        description="Controle simples de entrada e saída. Vincule cada movimento a um pedido ou a quem retirou."
+        description="Entrada, consumo e reserva. Cada movimento pode ser vinculado a um lote, à facção ou ao profissional responsável."
         action={
           <Dialog open={openNovo} onOpenChange={setOpenNovo}>
             <DialogTrigger asChild><Button variant="hero" size="lg"><Plus /> Novo material</Button></DialogTrigger>
@@ -145,7 +192,7 @@ const Materiais = () => {
       />
 
       {/* Resumo rápido */}
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
             <div className="rounded-xl bg-primary/10 p-2.5"><Boxes className="h-5 w-5 text-primary" /></div>
@@ -155,13 +202,19 @@ const Materiais = () => {
         <Card className={`shadow-soft ${stats.baixo > 0 ? "border-destructive/40" : ""}`}>
           <CardContent className="flex items-center gap-3 p-4">
             <div className="rounded-xl bg-destructive/10 p-2.5"><AlertTriangle className="h-5 w-5 text-destructive" /></div>
-            <div><p className="text-xs text-muted-foreground">Em estoque baixo</p><p className="font-display text-2xl font-bold text-destructive">{stats.baixo}</p></div>
+            <div><p className="text-xs text-muted-foreground">Disponível baixo</p><p className="font-display text-2xl font-bold text-destructive">{stats.baixo}</p></div>
           </CardContent>
         </Card>
         <Card className="shadow-soft">
           <CardContent className="flex items-center gap-3 p-4">
-            <div className="rounded-xl bg-accent/10 p-2.5"><History className="h-5 w-5 text-accent" /></div>
-            <div><p className="text-xs text-muted-foreground">Movimentações hoje</p><p className="font-display text-2xl font-bold">{stats.movsHoje}</p></div>
+            <div className="rounded-xl bg-accent/10 p-2.5"><Bookmark className="h-5 w-5 text-accent" /></div>
+            <div><p className="text-xs text-muted-foreground">Reservado (lotes)</p><p className="font-display text-2xl font-bold text-accent">{stats.reservadoTotal}</p></div>
+          </CardContent>
+        </Card>
+        <Card className="shadow-soft">
+          <CardContent className="flex items-center gap-3 p-4">
+            <div className="rounded-xl bg-surface p-2.5"><History className="h-5 w-5 text-primary" /></div>
+            <div><p className="text-xs text-muted-foreground">Movimentos hoje</p><p className="font-display text-2xl font-bold">{stats.movsHoje}</p></div>
           </CardContent>
         </Card>
       </div>
@@ -175,7 +228,7 @@ const Materiais = () => {
         <div className="flex gap-1 rounded-xl border border-border bg-card p-1">
           {[
             { v: "todos", l: "Todos" },
-            { v: "baixo", l: "Estoque baixo" },
+            { v: "baixo", l: "Disponível baixo" },
             { v: "ok", l: "Ok" },
           ].map((opt) => (
             <button
@@ -194,8 +247,10 @@ const Materiais = () => {
       {/* Lista de materiais */}
       <div className="grid gap-4 md:grid-cols-2">
         {filtrada.map((m) => {
-          const baixo = m.estoque < m.minimo;
-          const pct = Math.min(100, (m.estoque / Math.max(m.minimo * 2, 1)) * 100);
+          const reservado = m.reservado ?? 0;
+          const disp = disponivel(m);
+          const baixo = disp < m.minimo;
+          const pctDisp = Math.min(100, (disp / Math.max(m.minimo * 2, 1)) * 100);
           const ultimosMovs = movsDe(m.id).slice(0, 2);
           return (
             <Card key={m.id} className={`shadow-soft transition hover:shadow-warm ${baixo ? "border-destructive/40" : ""}`}>
@@ -213,45 +268,59 @@ const Materiais = () => {
                   {baixo && <Badge variant="outline" className="border-destructive/30 bg-destructive/10 text-destructive">Repor</Badge>}
                 </div>
 
-                <div className="mt-4">
-                  <div className="flex items-end justify-between">
-                    <div className="flex items-end gap-2">
-                      <span className="font-display text-3xl font-bold text-primary">{m.estoque}</span>
-                      <span className="pb-1 text-sm text-muted-foreground">{m.unidade}</span>
-                    </div>
-                    <span className="text-xs text-muted-foreground">mínimo: {m.minimo} {m.unidade}</span>
+                <div className="mt-4 grid grid-cols-3 gap-2">
+                  <div className="rounded-lg bg-surface p-2">
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Estoque</p>
+                    <p className="font-display text-lg font-bold text-foreground">{m.estoque} <span className="text-xs font-normal text-muted-foreground">{m.unidade}</span></p>
                   </div>
-                  <Progress value={pct} className={`mt-2 h-1.5 ${baixo ? "[&>div]:bg-destructive" : ""}`} />
+                  <div className="rounded-lg bg-accent/5 p-2">
+                    <p className="text-[10px] uppercase tracking-wider text-accent">Reservado</p>
+                    <p className="font-display text-lg font-bold text-accent">{reservado} <span className="text-xs font-normal text-muted-foreground">{m.unidade}</span></p>
+                  </div>
+                  <div className={`rounded-lg p-2 ${baixo ? "bg-destructive/5" : "bg-primary/5"}`}>
+                    <p className={`text-[10px] uppercase tracking-wider ${baixo ? "text-destructive" : "text-primary"}`}>Disponível</p>
+                    <p className={`font-display text-lg font-bold ${baixo ? "text-destructive" : "text-primary"}`}>{disp} <span className="text-xs font-normal text-muted-foreground">{m.unidade}</span></p>
+                  </div>
                 </div>
+                <Progress value={pctDisp} className={`mt-2 h-1.5 ${baixo ? "[&>div]:bg-destructive" : ""}`} />
+                <p className="mt-1 text-[11px] text-muted-foreground">Mínimo: {m.minimo} {m.unidade}</p>
 
                 {ultimosMovs.length > 0 && (
                   <div className="mt-4 space-y-1.5 rounded-lg bg-surface/60 p-2.5">
                     <p className="text-[11px] uppercase tracking-wider text-muted-foreground">Últimos movimentos</p>
                     {ultimosMovs.map((mv) => (
-                      <div key={mv.id} className="flex items-center gap-2 text-xs">
-                        {mv.tipo === "entrada"
-                          ? <ArrowDown className="h-3 w-3 text-success" />
-                          : <ArrowUp className="h-3 w-3 text-destructive" />}
-                        <span className="font-semibold">{mv.tipo === "entrada" ? "+" : "-"}{mv.quantidade} {m.unidade}</span>
-                        {mv.pedidoId && <span className="text-muted-foreground">· pedido {mv.pedidoId}</span>}
-                        {mv.membroId && <span className="text-muted-foreground">· {nomeMembro(mv.membroId)}</span>}
+                      <div key={mv.id} className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs">
+                        {mv.tipo === "entrada" && <ArrowDown className="h-3 w-3 text-success" />}
+                        {mv.tipo === "saida" && <ArrowUp className="h-3 w-3 text-destructive" />}
+                        {mv.tipo === "reserva" && <Bookmark className="h-3 w-3 text-accent" />}
+                        {mv.tipo === "liberar_reserva" && <BookmarkX className="h-3 w-3 text-muted-foreground" />}
+                        <span className="font-semibold">
+                          {mv.tipo === "entrada" ? "+" : mv.tipo === "saida" ? "-" : ""}{mv.quantidade} {m.unidade}
+                        </span>
+                        {mv.loteId && <span className="text-muted-foreground">· lote {mv.loteId}</span>}
+                        {!mv.loteId && mv.parceiroId && <span className="text-muted-foreground">· {nomeParceiro(mv.parceiroId)}</span>}
+                        {mv.profissionalId && <span className="text-muted-foreground">· {nomeProfissional(mv.profissionalId)}</span>}
                         <span className="ml-auto text-muted-foreground">{new Date(mv.data).toLocaleDateString("pt-BR")}</span>
                       </div>
                     ))}
                   </div>
                 )}
 
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Button size="sm" variant="soft" className="flex-1" onClick={() => setOpenMov({ material: m, tipo: "entrada" })}>
-                    <ArrowDown className="text-success" /> Entrada
-                  </Button>
-                  <Button size="sm" variant="soft" className="flex-1" onClick={() => setOpenMov({ material: m, tipo: "saida" })}>
-                    <ArrowUp className="text-destructive" /> Saída
-                  </Button>
+                <div className="mt-4 grid grid-cols-4 gap-2">
+                  {acoesTipos.map((a) => (
+                    <Button key={a.tipo} size="sm" variant="soft" onClick={() => setOpenMov({ material: m, tipo: a.tipo })}>
+                      <a.icon className={`h-4 w-4 ${a.className}`} /> {a.label}
+                    </Button>
+                  ))}
                   <Button size="sm" variant="ghost" onClick={() => setOpenHist(m.id)}>
                     <History className="h-4 w-4" />
                   </Button>
                 </div>
+                {reservado > 0 && (
+                  <Button size="sm" variant="ghost" className="mt-2 w-full text-xs" onClick={() => setOpenMov({ material: m, tipo: "liberar_reserva" })}>
+                    <BookmarkX className="mr-1 h-3.5 w-3.5" /> Liberar reserva
+                  </Button>
+                )}
               </CardContent>
             </Card>
           );
@@ -268,17 +337,30 @@ const Materiais = () => {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 font-display">
-              {openMov?.tipo === "entrada"
-                ? <><ArrowDown className="h-4 w-4 text-success" /> Registrar entrada</>
-                : <><ArrowUp className="h-4 w-4 text-destructive" /> Registrar saída</>}
-              <span className="text-muted-foreground">— {openMov?.material.nome}</span>
+              {openMov?.tipo === "entrada" && <><ArrowDown className="h-4 w-4 text-success" /> Registrar entrada</>}
+              {openMov?.tipo === "saida" && <><ArrowUp className="h-4 w-4 text-destructive" /> Registrar consumo</>}
+              {openMov?.tipo === "reserva" && <><Bookmark className="h-4 w-4 text-accent" /> Reservar para lote</>}
+              {openMov?.tipo === "liberar_reserva" && <><BookmarkX className="h-4 w-4" /> Liberar reserva</>}
+              <span className="truncate text-muted-foreground">— {openMov?.material.nome}</span>
             </DialogTitle>
           </DialogHeader>
           <div className="grid gap-4 py-2">
-            <div className="rounded-lg bg-surface p-3 text-xs">
-              <span className="text-muted-foreground">Estoque atual: </span>
-              <span className="font-semibold">{openMov?.material.estoque} {openMov?.material.unidade}</span>
-            </div>
+            {openMov && (
+              <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="rounded-lg bg-surface p-2">
+                  <p className="text-muted-foreground">Estoque</p>
+                  <p className="font-semibold">{openMov.material.estoque} {openMov.material.unidade}</p>
+                </div>
+                <div className="rounded-lg bg-accent/5 p-2">
+                  <p className="text-accent">Reservado</p>
+                  <p className="font-semibold">{openMov.material.reservado ?? 0} {openMov.material.unidade}</p>
+                </div>
+                <div className="rounded-lg bg-primary/5 p-2">
+                  <p className="text-primary">Disponível</p>
+                  <p className="font-semibold">{disponivel(openMov.material)} {openMov.material.unidade}</p>
+                </div>
+              </div>
+            )}
 
             <div>
               <Label>Quantidade ({openMov?.material.unidade})</Label>
@@ -293,36 +375,50 @@ const Materiais = () => {
               />
             </div>
 
-            <div>
-              <Label className="mb-2 block">Vincular este movimento a:</Label>
-              <Tabs value={movForm.vinculo} onValueChange={(v) => setMovForm({ ...movForm, vinculo: v as VinculoTab })}>
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="nenhum">Nenhum</TabsTrigger>
-                  <TabsTrigger value="pedido"><ClipboardList className="mr-1 h-3.5 w-3.5" /> Pedido</TabsTrigger>
-                  <TabsTrigger value="membro"><User className="mr-1 h-3.5 w-3.5" /> Funcionário</TabsTrigger>
-                </TabsList>
-                <TabsContent value="pedido" className="mt-3">
-                  <select
-                    value={movForm.pedidoId}
-                    onChange={(e) => setMovForm({ ...movForm, pedidoId: e.target.value })}
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">Selecione um pedido...</option>
-                    {pedidos.map((p) => <option key={p.id} value={p.id}>{p.id} · {p.produto}</option>)}
-                  </select>
-                </TabsContent>
-                <TabsContent value="membro" className="mt-3">
-                  <select
-                    value={movForm.membroId}
-                    onChange={(e) => setMovForm({ ...movForm, membroId: e.target.value })}
-                    className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    <option value="">Selecione um membro...</option>
-                    {equipe.filter((m) => m.ativo).map((m) => <option key={m.id} value={m.id}>{m.nome} — {m.funcao}</option>)}
-                  </select>
-                </TabsContent>
-              </Tabs>
-            </div>
+            {openMov?.tipo !== "liberar_reserva" && (
+              <div>
+                <Label className="mb-2 block">Vincular a:</Label>
+                <Tabs value={movForm.vinculo} onValueChange={(v) => setMovForm({ ...movForm, vinculo: v as VinculoTab })}>
+                  <TabsList className="grid w-full grid-cols-4">
+                    <TabsTrigger value="nenhum">—</TabsTrigger>
+                    <TabsTrigger value="lote"><ClipboardList className="mr-1 h-3.5 w-3.5" /> Lote</TabsTrigger>
+                    <TabsTrigger value="parceiro"><Factory className="mr-1 h-3.5 w-3.5" /> Facção</TabsTrigger>
+                    <TabsTrigger value="profissional"><UserRound className="mr-1 h-3.5 w-3.5" /> Prof.</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="lote" className="mt-3">
+                    <select
+                      value={movForm.loteId}
+                      onChange={(e) => setMovForm({ ...movForm, loteId: e.target.value })}
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">Selecione um lote em produção...</option>
+                      {lotesAtivos.map((l) => <option key={l.id} value={l.id}>{l.id} · {l.produto} — {l.quantidade} pç</option>)}
+                    </select>
+                    <p className="mt-1.5 text-[11px] text-muted-foreground">A facção responsável pelo lote será registrada automaticamente.</p>
+                  </TabsContent>
+                  <TabsContent value="parceiro" className="mt-3">
+                    <select
+                      value={movForm.parceiroId}
+                      onChange={(e) => setMovForm({ ...movForm, parceiroId: e.target.value })}
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">Selecione a facção / serviço...</option>
+                      {parceirosAtivos.map((p) => <option key={p.id} value={p.id}>{p.nome} — {tipoParceiroLabel[p.tipo]}</option>)}
+                    </select>
+                  </TabsContent>
+                  <TabsContent value="profissional" className="mt-3">
+                    <select
+                      value={movForm.profissionalId}
+                      onChange={(e) => setMovForm({ ...movForm, profissionalId: e.target.value })}
+                      className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">Selecione um profissional autônomo...</option>
+                      {profissionais.map((p) => <option key={p.id} value={p.id}>{p.nome} — {p.especialidade}</option>)}
+                    </select>
+                  </TabsContent>
+                </Tabs>
+              </div>
+            )}
 
             <div>
               <Label>Observação (opcional)</Label>
@@ -331,7 +427,7 @@ const Materiais = () => {
                 rows={2}
                 value={movForm.observacao}
                 onChange={(e) => setMovForm({ ...movForm, observacao: e.target.value })}
-                placeholder={openMov?.tipo === "entrada" ? "Ex: compra fornecedor X" : "Ex: corte do lote, refugo, amostra..."}
+                placeholder={openMov?.tipo === "entrada" ? "Ex: compra fornecedor X" : "Ex: consumo do lote, amostra, retorno..."}
               />
             </div>
           </div>
@@ -355,23 +451,29 @@ const Materiais = () => {
             {histMaterial && movsDe(histMaterial.id).map((mv) => (
               <div key={mv.id} className="flex items-start justify-between gap-3 rounded-lg border border-border p-3">
                 <div className="flex items-start gap-3">
-                  {mv.tipo === "entrada"
-                    ? <ArrowDown className="mt-0.5 h-4 w-4 text-success" />
-                    : <ArrowUp className="mt-0.5 h-4 w-4 text-destructive" />}
+                  {mv.tipo === "entrada" && <ArrowDown className="mt-0.5 h-4 w-4 text-success" />}
+                  {mv.tipo === "saida" && <ArrowUp className="mt-0.5 h-4 w-4 text-destructive" />}
+                  {mv.tipo === "reserva" && <Bookmark className="mt-0.5 h-4 w-4 text-accent" />}
+                  {mv.tipo === "liberar_reserva" && <BookmarkX className="mt-0.5 h-4 w-4 text-muted-foreground" />}
                   <div>
                     <p className="text-sm font-semibold">
-                      {mv.tipo === "entrada" ? "Entrada" : "Saída"} de {mv.quantidade} {histMaterial.unidade}
+                      {tipoLabel[mv.tipo]} de {mv.quantidade} {histMaterial.unidade}
                     </p>
                     {mv.observacao && <p className="text-xs text-muted-foreground">{mv.observacao}</p>}
-                    <div className="mt-1 flex flex-wrap gap-2 text-xs">
-                      {mv.pedidoId && (
-                        <span className="rounded bg-primary/10 px-2 py-0.5 font-mono text-primary">
-                          {mv.pedidoId} {nomePedido(mv.pedidoId) && `· ${nomePedido(mv.pedidoId)}`}
+                    <div className="mt-1 flex flex-wrap gap-1.5 text-xs">
+                      {mv.loteId && (
+                        <span className="rounded bg-primary/10 px-2 py-0.5 text-primary">
+                          <ClipboardList className="mr-1 inline h-3 w-3" />{nomeLote(mv.loteId)}
                         </span>
                       )}
-                      {mv.membroId && (
+                      {mv.parceiroId && (
                         <span className="rounded bg-accent/10 px-2 py-0.5 text-accent">
-                          <User className="mr-1 inline h-3 w-3" />{nomeMembro(mv.membroId)}
+                          <Factory className="mr-1 inline h-3 w-3" />{nomeParceiro(mv.parceiroId)}
+                        </span>
+                      )}
+                      {mv.profissionalId && (
+                        <span className="rounded bg-primary/5 px-2 py-0.5 text-primary">
+                          <UserRound className="mr-1 inline h-3 w-3" />{nomeProfissional(mv.profissionalId)}
                         </span>
                       )}
                     </div>

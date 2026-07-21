@@ -91,13 +91,14 @@ export interface Material {
   unidade: string;
   estoque: number;
   minimo: number;
+  reservado?: number; // comprometido com lotes em produção
   ultimaEntrada: string;
-  vinculadoA?: string; // pedido id
+  vinculadoA?: string; // pedido id (legado)
 }
 
-export type TipoMovimento = "entrada" | "saida";
+export type TipoMovimento = "entrada" | "saida" | "reserva" | "liberar_reserva";
 
-export type VinculoTipo = "pedido" | "membro" | "nenhum";
+export type VinculoTipo = "lote" | "parceiro" | "profissional" | "pedido" | "membro" | "nenhum";
 
 export interface MovimentoMaterial {
   id: string;
@@ -105,8 +106,11 @@ export interface MovimentoMaterial {
   tipo: TipoMovimento;
   quantidade: number;
   observacao?: string;
-  pedidoId?: string;
-  membroId?: string; // se o material foi entregue / devolvido por um membro da equipe
+  pedidoId?: string;       // ordem de produção
+  loteId?: string;         // lote distribuído
+  parceiroId?: string;     // facção / serviço
+  profissionalId?: string; // profissional autônomo
+  membroId?: string;       // legado
   data: string;
 }
 
@@ -268,12 +272,12 @@ export const pedidos: Pedido[] = [
 ];
 
 export const materiais: Material[] = [
-  { id: "M1", nome: "Tecido algodão branco", unidade: "m", estoque: 240, minimo: 50, ultimaEntrada: "2026-04-20", vinculadoA: "LT-2401" },
-  { id: "M2", nome: "Linha branca 5000m", unidade: "un", estoque: 8, minimo: 5, ultimaEntrada: "2026-04-15" },
-  { id: "M3", nome: "Tecido floral", unidade: "m", estoque: 12, minimo: 30, ultimaEntrada: "2026-04-10", vinculadoA: "LT-2402" },
-  { id: "M4", nome: "Botão madrepérola", unidade: "un", estoque: 1200, minimo: 200, ultimaEntrada: "2026-04-22" },
-  { id: "M5", nome: "Zíper 20cm", unidade: "un", estoque: 35, minimo: 50, ultimaEntrada: "2026-04-12" },
-  { id: "M6", nome: "Renda guipir", unidade: "m", estoque: 18, minimo: 10, ultimaEntrada: "2026-04-25" },
+  { id: "M1", nome: "Tecido algodão branco", unidade: "m", estoque: 240, minimo: 50, reservado: 60, ultimaEntrada: "2026-04-20", vinculadoA: "LT-2401" },
+  { id: "M2", nome: "Linha branca 5000m", unidade: "un", estoque: 8, minimo: 5, reservado: 0, ultimaEntrada: "2026-04-15" },
+  { id: "M3", nome: "Tecido floral", unidade: "m", estoque: 12, minimo: 30, reservado: 8, ultimaEntrada: "2026-04-10", vinculadoA: "LT-2402" },
+  { id: "M4", nome: "Botão madrepérola", unidade: "un", estoque: 1200, minimo: 200, reservado: 400, ultimaEntrada: "2026-04-22" },
+  { id: "M5", nome: "Zíper 20cm", unidade: "un", estoque: 35, minimo: 50, reservado: 0, ultimaEntrada: "2026-04-12" },
+  { id: "M6", nome: "Renda guipir", unidade: "m", estoque: 18, minimo: 10, reservado: 6, ultimaEntrada: "2026-04-25" },
 ];
 
 export const movimentosIniciais: MovimentoMaterial[] = [
@@ -585,10 +589,18 @@ export interface HistoricoLote {
   autor?: string;
 }
 
+export interface SubcontratadoLote {
+  profissionalId: string;
+  papel: string;     // ex: "reforço de costura", "acabamento"
+  pecas: number;
+  status: "convidado" | "confirmado" | "concluido";
+}
+
 export interface Lote {
   id: string;
   ordemId: string; // liga a um Pedido (ordem de produção)
   parceiroId: string; // facção/serviço responsável
+  confeccaoNome: string; // confecção coordenadora que enviou o lote
   produto: string;
   etapa: string; // corte, costura, bordado, lavagem...
   quantidade: number;
@@ -600,6 +612,7 @@ export interface Lote {
   observacoes?: string;
   historico: HistoricoLote[];
   avaliacao?: number;
+  subcontratados?: SubcontratadoLote[]; // profissionais autônomos ajudando a facção
 }
 
 // Facção "logada" no ambiente /faccao (MVP)
@@ -619,6 +632,7 @@ export const lotes: Lote[] = [
     id: "LOTE-501",
     ordemId: "LT-2401",
     parceiroId: "f1",
+    confeccaoNome: "Loja Mariposa",
     produto: "Camiseta básica branca",
     etapa: "costura",
     quantidade: 120,
@@ -633,11 +647,15 @@ export const lotes: Lote[] = [
       { data: "2026-04-26", texto: "Iniciada produção (30%).", autor: "Maria Souza" },
       { data: "2026-04-29", texto: "60% concluído.", autor: "Maria Souza" },
     ],
+    subcontratados: [
+      { profissionalId: "p3", papel: "Reforço no acabamento — 40 peças", pecas: 40, status: "confirmado" },
+    ],
   },
   {
     id: "LOTE-502",
     ordemId: "LT-2402",
     parceiroId: "s3",
+    confeccaoNome: "Atelier Rosa",
     produto: "Vestido floral",
     etapa: "bordado",
     quantidade: 40,
@@ -656,6 +674,7 @@ export const lotes: Lote[] = [
     id: "LOTE-503",
     ordemId: "LT-2403",
     parceiroId: "s4",
+    confeccaoNome: "Confecção Sertão",
     produto: "Calça jeans masculina",
     etapa: "corte",
     quantidade: 80,
@@ -674,6 +693,7 @@ export const lotes: Lote[] = [
     id: "LOTE-504",
     ordemId: "LT-2403",
     parceiroId: "s2",
+    confeccaoNome: "Confecção Sertão",
     produto: "Calça jeans masculina",
     etapa: "lavagem",
     quantidade: 80,
@@ -689,6 +709,7 @@ export const lotes: Lote[] = [
     id: "LOTE-505",
     ordemId: "LT-2404",
     parceiroId: "f1",
+    confeccaoNome: "Boutique Lírio",
     produto: "Blusa rendada",
     etapa: "costura",
     quantidade: 60,
@@ -708,6 +729,7 @@ export const lotes: Lote[] = [
     id: "LOTE-506",
     ordemId: "LT-2401",
     parceiroId: "s1",
+    confeccaoNome: "Loja Mariposa",
     produto: "Camiseta básica branca",
     etapa: "estampa",
     quantidade: 120,
