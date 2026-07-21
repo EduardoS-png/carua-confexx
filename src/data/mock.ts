@@ -589,10 +589,18 @@ export interface HistoricoLote {
   autor?: string;
 }
 
+export interface SubcontratadoLote {
+  profissionalId: string;
+  papel: string;     // ex: "reforço de costura", "acabamento"
+  pecas: number;
+  status: "convidado" | "confirmado" | "concluido";
+}
+
 export interface Lote {
   id: string;
   ordemId: string; // liga a um Pedido (ordem de produção)
   parceiroId: string; // facção/serviço responsável
+  confeccaoNome: string; // confecção coordenadora que enviou o lote
   produto: string;
   etapa: string; // corte, costura, bordado, lavagem...
   quantidade: number;
@@ -604,6 +612,7 @@ export interface Lote {
   observacoes?: string;
   historico: HistoricoLote[];
   avaliacao?: number;
+  subcontratados?: SubcontratadoLote[]; // profissionais autônomos ajudando a facção
 }
 
 // Facção "logada" no ambiente /faccao (MVP)
